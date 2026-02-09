@@ -1,0 +1,1576 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx}
+\setbeamercolor{palette primary}{bg=blue!60, fg=white}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{hyperref}
+
+%%%%%%%%%%%%% GRAFICOS
+%%%%% \begin{frame}{Fenómeno de Runge}
+%\begin{center}
+%\includegraphics[width=0.85\textwidth]{figuras/runge.pdf}
+%\end{center}
+%\end{frame}
+%%%%%%%%%
+
+
+\title{Interpolación en Análisis Numérico}
+\author{nICO no IKO 777}
+
+\date{}
+
+\begin{document}
+
+%\begin{frame}
+%\titlepage
+%\end{frame}
+%-------------------------------------------------
+\begin{frame}
+\titlepage
+\begin{center}
+%\href{https://www.youtube.com/watch?v=D2EoqOcIuuM&list=RDD2EoqOcIuuM&start_radio=1}{%
+\href{https://www.youtube.com/watch?v=ZxrBSad5FWQ&list=RDD2EoqOcIuuM&index=4}{
+\beamergotobutton{
+Vivaldi: Juditha triumphans}
+}
+
+Juditha Triumphans (RV 644) es el único oratorio completo de Antonio Vivaldi, compuesto en 1716 para celebrar la victoria veneciana contra los turcos, basándose en la historia bíblica de la heroína Judit que vence al general asirio Holofernes, y se caracteriza por un elenco completamente femenino (debido a su estreno en el orfanato femenino Ospedale della Pietà) y una rica instrumentación, siendo una obra maestra del barroco que combina dramatismo y esplendor musical. \href{https://es.wikipedia.org/wiki/Juditha_Triumphans}{\color{blue} Wiki}
+\end{center}
+\end{frame}
+
+\begin{frame}
+Oda a la interpolacion!! 
+
+Interpolar es no conocer a Hypatia,\\
+es construir sabiendo lo dicho,\\
+y aproximar según lo que creemos saber,\\
+tomando pequeñas perturbaciones en lo dicho,\\
+generando grandes cambios en lo humano.\\
+Por eso,\\
+en Newton: añadir y añadirás.\\
+y\\
+en Lagrange: añadir y empezar de nuevo.\\
+Solo un polinomio queda; no lo dejes, no lo dejes\\
+con el spline.
+\end{frame}
+
+
+%-------------------------------------------------
+\begin{frame}{Panorama general: Interpolación y aproximación}
+\textbf{Interpolación}
+\begin{itemize}
+\item Definición: construcción de una función que coincide con los datos dados.
+\item Ejemplos: datos discretos, funciones conocidas, contraejemplos (Runge).
+\end{itemize}
+
+\medskip
+\textbf{Métodos de interpolación}
+\begin{itemize}
+\item Polinomios: forma global, sencilla pero potencialmente inestable.
+\item Lagrange: formulación explícita y teórica.
+\item Newton: formulación incremental y computacionalmente eficiente.
+\end{itemize}
+
+\medskip
+\textbf{Otros métodos}
+\begin{itemize}
+\item Interpolación por tramos: aproximación local y estable.
+\item Splines: suavidad y estabilidad, método estándar en la práctica.
+\end{itemize}
+
+\medskip
+\textbf{Análisis numérico}
+\begin{itemize}
+\item Error de interpolación: truncamiento, redondeo y elección de nodos.
+\item Estabilidad y sensibilidad: propagación y amplificación del error.
+\end{itemize}
+
+\medskip
+\textbf{Taylor vs Interpolación}
+\begin{itemize}
+\item Taylor: aproximación local usando derivadas.
+\item Interpolación: aproximación global a partir de datos discretos.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Listado de scripts Matlab utilizados}
+\textbf{Interpolación y aproximación numérica}
+
+\medskip
+\begin{itemize}
+%\item \texttt{s0\_1.m}
+%\item \texttt{s0\_2.m}
+%\item \texttt{s0.m}
+\item \texttt{S12\_ERROR\_2.m}
+\item \texttt{S12\_ERROR.m}
+\item \texttt{S12\_EX1.m}
+\item \texttt{S12\_EX2.m}
+\item \texttt{S12\_EX3\_Runge.m}
+\item \texttt{S12\_LAGRANGE\_1.m}
+\item \texttt{S12\_LAGRANGE\_2.m}
+\item \texttt{S12\_NEWTON\_1.m}
+\item \texttt{S12\_NEWTON\_2.m}
+\item \texttt{S12\_RUNGE\_COMPARA.m}
+\item \texttt{S12\_SPLINES\_1.m}
+\item \texttt{s12\_tramos\_1.m}
+\end{itemize}
+
+\medskip
+Cada script ilustra un concepto distinto del capítulo
+(interpolación, error, estabilidad y métodos numéricos).
+\end{frame}
+
+
+
+%-------------------------------------------------
+\begin{frame}{¿Qué es interpolar?}
+\textbf{Idea básica:}
+
+Interpolar consiste en construir una función sencilla que pase exactamente por un conjunto finito de datos conocidos:
+\[
+(x_0,f(x_0)), (x_1,f(x_1)), \dots, (x_n,f(x_n)).
+\]
+
+\medskip
+El objetivo es:
+\begin{itemize}
+\item Estimar valores intermedios.
+\item Reconstruir una función desconocida a partir de datos.
+\item Trabajar con modelos computacionalmente manejables.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Motivación}
+\begin{itemize}
+\item En la práctica no conocemos funciones exactas, solo datos.
+\item Las mediciones experimentales son discretas.
+\item Los ordenadores trabajan con valores finitos.
+\end{itemize}
+
+\medskip
+\textbf{Mensaje clave:}
+\begin{block}{}
+La interpolación es el puente entre los datos discretos y los modelos continuos.
+\end{block}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Ejemplo simple}
+Supongamos que conocemos:
+\[
+f(0)=1,\quad f(1)=2
+\]
+
+El polinomio interpolante de grado 1 es:
+\[
+p(x)=1+x
+\]
+
+\medskip
+Este polinomio:
+\begin{itemize}
+\item Pasa exactamente por los datos.
+\item Aproxima la función real entre los nodos.
+\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%
+
+%-------------------------------------------------
+%-------------------------------------------------
+\begin{frame}{Ejemplo: polinomio $p(x)=1+x$}
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines = middle,
+    xlabel = {$x$},
+    ylabel = {$y$},
+    xmin = -1, xmax = 2,
+    ymin = 0, ymax = 3,
+    grid = both,
+    width = 0.75\textwidth,
+    height = 0.5\textwidth,
+    domain = -1:2,
+    samples = 100,
+    legend style={at={(0.05,0.95)},anchor=north west}
+]
+% Recta p(x)=1+x
+\addplot[blue, thick] {1+x};
+\addlegendentry{$p(x)=1+x$}
+
+% Puntos interpolados
+\addplot[only marks, red, mark=*, mark size=3]
+coordinates {(0,1) (1,2)};
+\addlegendentry{Puntos $(0,1)$ y $(1,2)$}
+
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%-------------------------------------------------
+\begin{frame}{Nodos de interpolación}
+\textbf{Definición}
+
+Sean $x_0,x_1,\dots,x_n$ puntos reales distintos.
+Se llaman \emph{nodos de interpolación} a los puntos donde se conocen
+los valores de la función:
+\[
+(x_0,f(x_0)), (x_1,f(x_1)), \dots, (x_n,f(x_n)).
+\]
+
+Estos puntos determinan completamente el problema de interpolación.
+\begin{itemize}
+\item Los nodos son los puntos donde hay información disponible.
+\item El polinomio interpolante pasa exactamente por los nodos.
+\item La elección de los nodos influye en el error y la estabilidad.
+\end{itemize}
+\end{frame}
+
+
+%-------------------------------------------------
+\begin{frame}{Interpolación polinómica}
+\textbf{Definición}
+
+Dados $n+1$ puntos con $x_i \neq x_j$, existe un único polinomio $p_n(x)$ de grado $\le n$ tal que:
+\[
+p_n(x_i)=f(x_i)
+\]
+
+\medskip
+Este resultado garantiza que el problema de interpolación está bien planteado.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% MODULO POLINOMIOS
+
+%=================================================
+% EJEMPLOS: INTERPOLACIÓN POLINÓMICA (MATLAB)
+%=================================================
+
+%-------------------------------------------------
+\begin{frame}{Ejemplo 1: Interpolación polinómica básica}
+Supongamos que conocemos los valores de una función solo en los puntos:
+\[
+(0,1), \quad (1,2), \quad (2,0)
+\]
+
+Buscamos el polinomio interpolante de grado 2 que pase exactamente por estos datos.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}[fragile]{Ejemplo 1: Código Matlab}
+\begin{verbatim}
+% Datos conocidos
+x = [0 1 2];
+y = [1 2 0];
+
+% Polinomio interpolante de grado 2
+p = polyfit(x, y, 2);
+
+% Evaluación en una malla fina
+xx = linspace(0, 2, 200);
+yy = polyval(p, xx);
+
+% Gráfica
+figure
+plot(x, y, 'ro', 'MarkerSize', 8, 'LineWidth', 2)
+hold on
+plot(xx, yy, 'b-', 'LineWidth', 2)
+grid on
+legend('Datos', 'Polinomio interpolante')
+title('Interpolación polinómica de grado 2')
+xlabel('x')
+ylabel('y')
+\end{verbatim}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Ejemplo 1: Interpretación}
+\begin{itemize}
+\item Tres puntos determinan un único polinomio de grado menor o igual que 2.
+\item El polinomio pasa exactamente por los datos conocidos.
+\item El polinomio no representa necesariamente la función real.
+\end{itemize}
+
+\medskip
+Este es un modelo construido únicamente a partir información discreta.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Ejemplo 2: Interpolación de una función conocida}
+Consideremos la función:
+\[
+f(x)=\sin(x), \quad x\in[0,\pi]
+\]
+
+Supondremos que solo conocemos sus valores en un número reducido de nodos,
+y construiremos el polinomio interpolante correspondiente.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}[fragile]{Ejemplo 2: Código Matlab}
+\begin{verbatim}
+% Función original
+f = @(x) sin(x);
+
+% Nodos de interpolación
+x = linspace(0, pi, 5);
+y = f(x);
+
+% Polinomio interpolante (grado 4)
+p = polyfit(x, y, length(x)-1);
+
+% Malla fina
+xx = linspace(0, pi, 400);
+yy = polyval(p, xx);
+
+% Valor real de la función
+ff = f(xx);
+
+% Gráficas
+figure
+plot(xx, ff, 'k--', 'LineWidth', 2)
+hold on
+plot(xx, yy, 'b-', 'LineWidth', 2)
+plot(x, y, 'ro', 'MarkerSize', 8, 'LineWidth', 2)
+grid on
+legend('f(x)=sin(x)', 'Interpolación', 'Nodos')
+title('Interpolación polinómica de sin(x)')
+xlabel('x')
+ylabel('y')
+\end{verbatim}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Ejemplo 2: Observaciones}
+\begin{itemize}
+\item El polinomio coincide con la función en los nodos.
+\item Entre nodos aparece un error de interpolación.
+\item Aumentar el grado del polinomio no garantiza siempre una mejor aproximación.
+\end{itemize}
+
+\medskip
+Este ejemplo prepara el terreno para el análisis del error y el fenómeno de Runge.
+
+\begin{block}{}
+La interpolación polinómica es sencilla y potente,
+pero puede ser inestable y sensible si se abusa del grado.
+\end{block}
+\end{frame}
+
+%-------------------------------------------------
+
+
+%=================================================
+% EXPLICACIÓN DE COMANDOS MATLAB: polyfit, linspace, polyval
+%=================================================
+
+{
+  \setbeamercolor{background canvas}{bg=green!11}
+  \setbeamercolor{frametitle}{fg=black}
+%-------------------------------------------------
+\begin{frame}{Sobre los comandos: ¿Qué hace \texttt{polyfit}?}
+El comando
+\[
+\texttt{p = polyfit(x,y,n)}
+\]
+construye un polinomio de grado $n$ a partir de datos discretos.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{\texttt{polyfit}: interpretación matemática}
+Dados los datos:
+\[
+(x_0,y_0),\,(x_1,y_1),\dots,(x_m,y_m),
+\]
+\texttt{polyfit} busca un polinomio
+\[
+p(x)=a_n x^n + a_{n-1}x^{n-1} + \cdots + a_1 x + a_0
+\]
+cuyos coeficientes se almacenan en el vector:
+\[
+\texttt{p = [}a_n,\dots,a_0\texttt{]}.
+\]
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{\texttt{polyfit} e interpolación}
+\begin{itemize}
+\item Si se usan $n+1$ puntos y un polinomio de grado $n$,
+      el polinomio interpola exactamente los datos.
+\item Si se usan más puntos que el grado,
+      \texttt{polyfit} calcula un ajuste en el sentido de mínimos cuadrados.
+\end{itemize}
+
+\medskip
+{\color{red}
+\texttt{polyfit} construye un modelo a partir de los datos disponibles,
+no la función real.
+}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Sobre los comandos: ¿Qué hace \texttt{linspace}?}
+El comando
+\[
+\texttt{xx = linspace(a,b,N)}
+\]
+genera $N$ puntos equiespaciados en el intervalo $[a,b]$.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{\texttt{linspace}: significado matemático}
+Los puntos generados son:
+\[
+x_1=a,\; x_2=a+h,\; \dots,\; x_N=b,
+\quad
+h=\frac{b-a}{N-1}.
+\]
+
+\medskip
+{\color{red}
+\texttt{linspace} no añade información nueva:
+solo crea una malla fina para evaluar funciones.
+}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Sobre los comandos: ¿Qué hace \texttt{polyval}?}
+El comando
+\[
+\texttt{yy = polyval(p,xx)}
+\]
+evalúa el polinomio definido por los coeficientes \texttt{p}
+en los puntos del vector \texttt{xx}.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{\texttt{polyval}: interpretación matemática}
+Si
+\[
+p(x)=a_n x^n + \cdots + a_1 x + a_0,
+\]
+entonces \texttt{polyval} calcula:
+\[
+yy_i = p(xx_i), \quad i=1,\dots,N.
+\]
+
+\medskip
+Es decir, evalúa el polinomio punto a punto.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Flujo típico en interpolación polinómica}
+\begin{center}
+\texttt{x, y} \\
+$\downarrow$ \\
+\texttt{polyfit} \\
+$\downarrow$ \\
+\texttt{p} (coeficientes del polinomio) \\
+$\downarrow$ \\
+\texttt{linspace} \\
+$\downarrow$ \\
+\texttt{xx} (malla fina) \\
+$\downarrow$ \\
+\texttt{polyval} \\
+$\downarrow$ \\
+\texttt{yy} (valores del polinomio)
+\end{center}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Resumen}
+\begin{itemize}
+\item \texttt{polyfit}: construye el polinomio interpolante.
+\item \texttt{linspace}: crea puntos para visualizar el polinomio.
+\item \texttt{polyval}: evalúa el polinomio en esos puntos.
+\end{itemize}
+
+%\medskip
+%\begin{block}{}
+%Interpolar es modelar; evaluar es calcular; dibujar es interpretar.
+%\end{block}
+\end{frame}
+
+
+}
+
+%=================================================
+% CONTRAEJEMPLO CLÁSICO: FENÓMENO DE RUNGE
+%=================================================
+{
+\setbeamercolor{background canvas}{bg=yellow!10}
+\setbeamercolor{frametitle}{fg=red!70!black}
+
+%-------------------------------------------------
+\begin{frame}{El fenómeno de Runge}
+Consideremos la función de Runge:
+\[
+f(x)=\frac{1}{1+25x^2}, \quad x\in[-1,1].
+\]
+
+Esta función es suave y perfectamente regular en todo el intervalo.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpolación polinómica en nodos equiespaciados}
+Interpolamos la función de Runge usando nodos equiespaciados en $[-1,1]$
+y polinomios de grado creciente.
+
+Al usar nodos equiespaciados:
+\begin{itemize}
+\item El error crece cerca de los extremos.
+\item Aparecen oscilaciones.
+\end{itemize}
+
+\begin{block}{Conclusión}
+Más grado no implica mejor aproximación.
+\end{block}
+
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}[fragile]{Fenómeno de Runge: Código Matlab}
+\begin{verbatim}
+% Función de Runge
+f = @(x) 1./(1 + 25*x.^2);
+
+% Intervalo
+a = -1; 
+b = 1;
+
+% Nodos equiespaciados
+n = 15;                      % grado del polinomio
+x = linspace(a, b, n+1);
+y = f(x);
+
+% Polinomio interpolante
+p = polyfit(x, y, n);
+
+% Malla fina para visualizar
+xx = linspace(a, b, 1000);
+yy = polyval(p, xx);
+
+% Función exacta
+ff = f(xx);
+
+% Gráfica
+figure
+plot(xx, ff, 'k--', 'LineWidth', 2)
+hold on
+plot(xx, yy, 'b-', 'LineWidth', 2)
+plot(x, y, 'ro', 'MarkerSize', 6, 'LineWidth', 2)
+grid on
+legend('f(x)', 'Interpolación', 'Nodos')
+title('Fenómeno de Runge con nodos equiespaciados')
+xlabel('x')
+ylabel('y')
+\end{verbatim}
+\end{frame}
+
+%-------------------------------------------------
+
+\begin{frame}{¿Qué se observa? Ojo al parche}
+\begin{itemize}
+\item El polinomio interpola exactamente los datos.
+\item Aparecen grandes oscilaciones cerca de los extremos.
+\item El error aumenta al crecer el grado del polinomio.
+\end{itemize}
+\begin{block}{}
+El fenómeno de Runge muestra que aumentar el grado del polinomio
+no garantiza una mejor aproximación.
+\end{block}
+
+\medskip
+La interpolación polinómica puede ser inestable
+si se eligen mal los nodos. ¿Por qué empeora si la función es suave?
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-------------------------------------------------
+\begin{frame}{Explicación teórica del fenómeno de Runge}
+Sea $f \in C^{n+1}([-1,1])$ y sea $p_n$ el polinomio interpolante en los nodos
+$x_0,\dots,x_n$.  
+El error de interpolación satisface:
+\[
+f(x)-p_n(x)
+=
+\frac{f^{(n+1)}(\xi_x)}{(n+1)!}
+\prod_{i=0}^{n}(x-x_i),
+\quad \xi_x \in (-1,1).
+\]
+
+\medskip
+El comportamiento del error está gobernado por el término nodal:
+\[
+\omega_{n+1}(x)=\prod_{i=0}^{n}(x-x_i).
+\]
+
+\medskip
+Para nodos equiespaciados en $[-1,1]$:
+\begin{itemize}
+\item $\omega_{n+1}(x)$ crece rápidamente cerca de los extremos del intervalo.
+\item El error se amplifica en los bordes, aunque la función sea suave.
+\item Aumentar el grado incrementa esta amplificación.
+\end{itemize}
+
+\medskip
+\begin{block}{Conclusión}
+El fenómeno de Runge no es un fallo del método,
+sino una consecuencia directa del término analítico del error
+y de la mala elección de nodos.
+\end{block}
+\end{frame}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%-------------------------------------------------
+%-------------------------------------------------
+{
+\setbeamercolor{background canvas}{bg=purple!3}
+\setbeamercolor{frametitle}{fg=brown!60!black}
+\begin{frame}{¿Por qué no sirve un polinomio de grado 2 con 4 puntos?}
+Un polinomio de grado 2 tiene la forma:
+\[
+p(x)=ax^2+bx+c
+\]
+
+Tiene únicamente tres coeficientes libres.
+
+Interpolar cuatro puntos distintos implica imponer:
+\[
+p(x_i)=y_i, \quad i=0,1,2,3.
+\]
+
+Esto da lugar a cuatro ecuaciones con solo tres incógnitas,
+lo cual no tiene solución en general.
+\begin{block}{}
+Para interpolar $n+1$ puntos distintos se necesita,
+en general, un polinomio de grado al menos $n$.
+\end{block}
+\end{frame}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-------------------------------------------------
+\begin{frame}{Método de Lagrange}
+\textbf{Definición}
+
+El polinomio interpolante se escribe como:
+\[
+p(x)=\sum_{i=0}^n f(x_i)\ell_i(x),
+\quad
+\ell_i(x)=\prod_{j\neq i}\frac{x-x_j}{x_i-x_j}
+\]
+
+\medskip
+\textbf{Motivación}
+\begin{itemize}
+\item Forma explícita y teórica.
+\item Muy útil para demostraciones.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+%\begin{frame}{Lagrange: pros y contras}
+%\textbf{Ventajas}
+%\begin{itemize}
+%\item Fórmula cerrada.
+%\item Fácil de entender conceptualmente.
+%\end{itemize}
+
+%\medskip
+%\textbf{Desventajas}
+%\begin{itemize}
+%\item Coste computacional elevado.
+%\item Poco flexible si se añaden nuevos puntos.
+%\end{itemize}
+%\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%=================================================
+% OBSERVACIONES, PROS Y CONTRAS
+% LAGRANGE, POLINOMIOS, NEWTON
+%=================================================
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%NEWTON
+
+%-------------------------------------------------
+\begin{frame}{Método de Newton}
+\textbf{Definición}
+
+El polinomio interpolante se expresa como:
+\[
+p(x)=a_0 + a_1(x-x_0) + a_2(x-x_0)(x-x_1)+\cdots
+\]
+
+Los coeficientes $a_i$ se calculan mediante \textbf{diferencias divididas}.
+\end{frame}
+
+
+%-------------------------------------------------
+\begin{frame}{Interpolación de Newton: forma general}
+Sean
+\[
+x_0, x_1, \dots, x_n
+\]
+nodos de interpolación distintos, y sea $f$ una función conocida en dichos puntos.
+
+El \textbf{polinomio interpolante de Newton} se escribe como:
+\[
+p_n(x)
+=
+a_0
++ a_1 (x - x_0)
++ a_2 (x - x_0)(x - x_1)
++ \cdots
++ a_n \prod_{k=0}^{n-1} (x - x_k),
+\]
+donde los coeficientes $a_k$ se calculan mediante
+\textbf{diferencias divididas}.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Coeficientes: diferencias divididas}
+Los coeficientes del polinomio de Newton vienen dados por:
+\[
+a_0 = f[x_0],
+\]
+\[
+a_1 = f[x_0,x_1],
+\]
+\[
+a_2 = f[x_0,x_1,x_2],
+\quad \dots \quad
+a_n = f[x_0,x_1,\dots,x_n],
+\]
+donde las diferencias divididas se definen recursivamente como:
+\[
+f[x_i,\dots,x_{i+k}]
+=
+\frac{
+f[x_{i+1},\dots,x_{i+k}]
+-
+f[x_i,\dots,x_{i+k-1}]
+}{
+x_{i+k}-x_i
+}.
+\]
+
+\medskip
+Esta forma permite construir el polinomio de manera incremental
+al añadir nuevos nodos.
+\end{frame}
+
+
+%-------------------------------------------------
+\begin{frame}{Newton: motivación y ventajas}
+\textbf{Motivación}
+\begin{itemize}
+\item Pensado para implementación numérica.
+\item Fácil actualización al añadir nodos.
+\end{itemize}
+
+\medskip
+\textbf{Ventajas}
+\begin{itemize}
+\item Más estable que Lagrange.
+\item Computacionalmente eficiente.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Análisis del error de interpolación}
+Si $f \in C^{n+1}$, el error viene dado por:
+\[
+f(x)-p_n(x)=\frac{f^{(n+1)}(\xi)}{(n+1)!}
+\prod_{i=0}^n (x-x_i)
+\]
+
+\medskip
+El error depende de:
+\begin{itemize}
+\item La regularidad de $f$.
+\item La distribución de los nodos.
+\item El grado del polinomio.
+\end{itemize}
+\end{frame}
+
+
+{
+\setbeamercolor{background canvas}{bg=orange!4}
+\setbeamercolor{frametitle}{fg=red!55!white}
+%-------------------------------------------------
+\begin{frame}{COMPARANDO ANDO!!!}
+\begin{itemize}
+\item Todos los métodos construyen el \emph{mismo polinomio interpolante}.
+\item Lo que cambia es la forma de construirlo y representarlo.
+\item La interpolación polinómica es un problema matemático único,
+      pero con múltiples formulaciones.
+\end{itemize}
+
+\begin{center}
+%\medskip
+{\color{red}
+El polinomio es único; el método no.
+}
+\end{center}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpolación polinómica (forma clásica)}
+\textbf{Idea}
+
+Se busca directamente el polinomio:
+\[
+p(x)=a_n x^n + \cdots + a_1 x + a_0
+\]
+cuyos coeficientes satisfacen las condiciones de interpolación.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpolación polinómica: pros y contras}
+\textbf{Ventajas}
+\begin{itemize}
+\item Forma compacta del polinomio.
+\item Fácil evaluación una vez conocidos los coeficientes.
+\item Implementación directa en software (por ejemplo, \texttt{polyfit}).
+\end{itemize}
+
+\medskip
+\textbf{Desventajas}
+\begin{itemize}
+\item Poco intuitiva desde el punto de vista conceptual.
+\item Resolver sistemas puede ser numéricamente inestable.
+\item Difícil de actualizar al añadir nuevos nodos.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpolación de Lagrange}
+\textbf{Idea}
+
+El polinomio se construye como combinación de polinomios base:
+\[
+p(x)=\sum_{i=0}^n f(x_i)\,L_i(x),
+\]
+donde cada $L_i(x)$ vale 1 en $x_i$ y 0 en el resto de nodos.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Lagrange: observaciones clave}
+\begin{itemize}
+\item No se resuelven sistemas de ecuaciones.
+\item Cada nodo contribuye de forma clara al polinomio final.
+\item El método es completamente explícito.
+\end{itemize}
+
+%\medskip
+%Ideal para entender qué significa interpolar.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Lagrange: pros y contras}
+\textbf{Ventajas}
+\begin{itemize}
+\item Interpretación matemática clara.
+\item Fórmula explícita del polinomio.
+\item Muy útil para demostraciones teóricas.
+\end{itemize}
+
+\medskip
+\textbf{Desventajas}
+\begin{itemize}
+\item Coste computacional elevado.
+\item Poco estable para muchos nodos.
+\item Añadir un nodo obliga a recomenzar todo el cálculo.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpolación de Newton}
+\textbf{Idea}
+
+El polinomio se escribe de forma incremental:
+\[
+p(x)=a_0 + a_1(x-x_0) + a_2(x-x_0)(x-x_1) + \cdots
+\]
+
+Los coeficientes se obtienen mediante diferencias divididas.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Newton: observaciones clave}
+\begin{itemize}
+\item El polinomio se construye de manera progresiva.
+\item Añadir un nuevo nodo no invalida los cálculos anteriores.
+\item Forma especialmente adecuada para implementación numérica.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Newton: pros y contras}
+\textbf{Ventajas}
+\begin{itemize}
+\item Más eficiente computacionalmente.
+\item Fácil actualización con nuevos datos.
+\item Mejor comportamiento numérico que Lagrange.
+\end{itemize}
+
+\medskip
+\textbf{Desventajas}
+\begin{itemize}
+\item Menos intuitivo al inicio.
+\item Requiere una estructura de datos adicional.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Comparación de métodos}
+\begin{center}
+\begin{tabular}{lccc}
+\textbf{Método} & \textbf{Intuición} & \textbf{Eficiencia} & \textbf{Flexibilidad} \\
+\hline
+Polinomios & Media & Media & Baja \\
+Lagrange & Alta & Baja & Muy baja \\
+Newton & Media & Alta & Alta \\
+\end{tabular}
+\end{center}
+Lagrange es ideal para comprender,
+Newton es ideal para calcular,
+y la forma clásica es ideal para evaluar.
+
+\medskip
+La elección del método importa tanto como el polinomio.
+\end{frame}
+
+
+}
+
+
+
+%-------------------------------------------------
+
+
+%-------------------------------------------------
+\begin{frame}{Estabilidad y sensibilidad}
+\textbf{Estabilidad}
+\begin{itemize}
+\item Pequeños cambios en los datos pueden producir grandes cambios en el polinomio.
+\item Polinomios de alto grado suelen ser inestables.
+\end{itemize}
+
+\medskip
+\textbf{Sensibilidad}
+\begin{itemize}
+\item La interpolación es sensible al ruido.
+\item En datos experimentales, interpolar puede ser mala idea.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Errores en interpolación}
+\begin{itemize}
+\item Error de truncamiento.
+\item Error de redondeo.
+\item Error por mala elección de nodos.
+\end{itemize}
+
+\medskip
+\textbf{Mensaje final}
+\begin{block}{}
+La interpolación es poderosa, pero debe usarse con cuidado.
+\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%=================================================
+% ANÁLISIS DE ERROR, ESTABILIDAD Y SENSIBILIDAD
+% EN INTERPOLACIÓN POLINÓMICA
+%=================================================
+
+%-------------------------------------------------
+\begin{frame}{Error en interpolación polinómica}
+Sea $f \in C^{n+1}([a,b])$ y $p_n$ el polinomio interpolante en los nodos
+$x_0,\dots,x_n$.
+El error viene dado por:
+\[
+f(x)-p_n(x)=
+\frac{f^{(n+1)}(\xi)}{(n+1)!}
+\prod_{i=0}^n (x-x_i),
+\quad \xi=\xi(x)\in(a,b).
+\]
+
+\medskip
+Esta expresión es válida para \emph{cualquier formulación} del polinomio:
+clásica, Lagrange o Newton.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpretación del error}
+El error de interpolación depende de:
+\begin{itemize}
+\item La regularidad de la función ($f^{(n+1)}$).
+\item El grado del polinomio.
+\item La posición de los nodos.
+\end{itemize}
+
+\medskip
+\begin{block}{}
+El método no cambia el error teórico;
+la elección de nodos sí.
+\end{block}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Error en la forma polinómica clásica}
+\textbf{Observaciones}
+\begin{itemize}
+\item El error teórico es el mismo que en Lagrange y Newton.
+\item La forma monomial puede amplificar errores numéricos.
+\end{itemize}
+
+\medskip
+\textbf{Consecuencia}
+\begin{itemize}
+\item Sensible a errores de redondeo.
+\item Mal condicionamiento para grados altos.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Error en Lagrange}
+\textbf{Observaciones}
+\begin{itemize}
+\item Error teórico bien expresado mediante los polinomios base.
+\item El producto $\prod (x-x_i)$ puede crecer rápidamente.
+\end{itemize}
+
+\medskip
+\textbf{Consecuencia}
+\begin{itemize}
+\item Puede ser numéricamente inestable.
+\item Muy sensible a la distribución de nodos.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Error en Newton}
+\textbf{Observaciones}
+\begin{itemize}
+\item El error teórico es idéntico.
+\item La forma incremental mejora el comportamiento numérico.
+\end{itemize}
+
+\medskip
+\textbf{Consecuencia}
+\begin{itemize}
+\item Menor propagación del error.
+\item Mejor control al añadir nuevos nodos.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Tipos de error: truncamiento}
+\textbf{Error de truncamiento}
+\begin{itemize}
+\item Se produce al limitar el grado del polinomio.
+\item Aparece incluso con aritmética exacta.
+\end{itemize}
+
+\medskip
+\textbf{En todos los métodos}
+\begin{itemize}
+\item Es inherente a la interpolación polinómica.
+\item Aumentar el grado no siempre lo reduce (Runge).
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Tipos de error: redondeo}
+\textbf{Error de redondeo}
+\begin{itemize}
+\item Proviene de la aritmética finita del ordenador.
+\end{itemize}
+
+\medskip
+\textbf{Comparación}
+\begin{itemize}
+\item Forma clásica: muy sensible.
+\item Lagrange: sensible para muchos nodos.
+\item Newton: mejor comportamiento numérico.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Tipos de error: mala elección de nodos}
+\textbf{Error por nodos mal elegidos}
+\begin{itemize}
+\item Nodos equiespaciados pueden provocar oscilaciones.
+\item Aparece el fenómeno de Runge.
+\end{itemize}
+
+\medskip
+\begin{block}{}
+La elección de nodos es más importante que el método.
+\end{block}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Medidas del error}
+Sea $p(x)$ el polinomio interpolante de $f(x)$.
+
+\begin{itemize}
+\item El error puntual se define como:
+\[
+|f(x)-p(x)|.
+\]
+
+\item Una medida global habitual es el error máximo:
+\[
+\|f-p\|_\infty = \max_{x\in[a,b]} |f(x)-p(x)|.
+\]
+\end{itemize}
+
+\medskip
+Esta magnitud permite comparar la calidad de distintas interpolaciones.
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%-------------------------------------------------
+\begin{frame}{Estabilidad y sensibilidad}
+\textbf{Sensibilidad}
+\begin{itemize}
+\item Mide cómo afectan pequeños cambios en los datos.
+\end{itemize}
+
+\medskip
+\textbf{Estabilidad}
+\begin{itemize}
+\item Evalúa la propagación de errores numéricos.
+\end{itemize}
+
+\medskip
+La interpolación polinómica es un problema
+potencialmente mal condicionado.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Estabilidad por método}
+\begin{itemize}
+\item \textbf{Forma clásica}: poco estable para grados altos.
+\item \textbf{Lagrange}: inestable con muchos nodos.
+\item \textbf{Newton}: más estable y controlable.
+\end{itemize}
+
+\medskip
+Newton es preferido en análisis numérico práctico.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Experimento de sensibilidad}
+\textbf{En la parte superior:}
+\begin{itemize}
+\item Dos curvas muy parecidas.
+\item Diferencias casi invisibles a simple vista.
+\item Mismos nodos de interpolación.
+\end{itemize}
+
+\medskip
+\textbf{En la parte inferior:}
+\begin{itemize}
+\item La diferencia no es pequeña.
+\item Aparece en todo el intervalo.
+\item Se amplifica lejos del nodo perturbado.
+\end{itemize}
+\end{frame}
+
+
+%-------------------------------------------------
+\begin{frame}{Resumen: pros y contras}
+\begin{center}
+\begin{tabular}{lccc}
+\textbf{Método} & \textbf{Estabilidad} & \textbf{Sensibilidad} & \textbf{Flexibilidad} \\
+\hline
+Polinomios & Baja & Alta & Baja \\
+Lagrange   & Media--baja & Alta & Muy baja \\
+Newton     & Media--alta & Media & Alta \\
+\end{tabular}
+\end{center}
+El error viene del problema,
+la inestabilidad del método,
+y la mala elección de nodos.
+
+Interpolar bien no es solo calcular,
+es decidir cómo y dónde.
+\end{frame}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% splines nodos de Chebyshev, ESTO para un trabajo
+
+%interpolación por tramos,
+
+%splines
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{INTERPOLACIÓN POR TRAMOS Y SPLINES}
+%=================================================
+% INTERPOLACIÓN POR TRAMOS Y SPLINES
+%=================================================
+
+%-------------------------------------------------
+\begin{frame}{Interpolación por tramos}
+\textbf{Idea}
+
+En lugar de aproximar una función con un único polinomio en todo el intervalo,
+se divide el dominio en subintervalos y se interpola localmente en cada uno de ellos.
+
+\medskip
+Sea
+\[
+x_0 < x_1 < \cdots < x_n,
+\]
+la interpolación por tramos construye funciones polinómicas distintas
+en cada intervalo $[x_i,x_{i+1}]$.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Motivación de la interpolación por tramos}
+\begin{itemize}
+\item Evitar polinomios de alto grado.
+\item Reducir oscilaciones globales.
+\item Mejorar la estabilidad numérica.
+\item Controlar mejor el error local.
+\end{itemize}
+
+\medskip
+\begin{block}{}
+Aproximar localmente suele ser más estable que aproximar globalmente.
+\end{block}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpolación lineal por tramos}
+En la interpolación lineal por tramos:
+\begin{itemize}
+\item En cada intervalo $[x_i,x_{i+1}]$ se usa un polinomio de grado 1.
+\item La función interpolante es continua.
+\item Las derivadas presentan discontinuidades en los nodos.
+\end{itemize}
+
+\medskip
+Es el método por tramos más sencillo y estable.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Limitaciones de la interpolación por tramos}
+\begin{itemize}
+\item La función resultante puede no ser suave.
+\item Las derivadas pueden tener saltos en los nodos.
+\item No siempre es adecuada para modelar fenómenos suaves.
+\end{itemize}
+
+\medskip
+Esto motiva la introducción de los \textbf{splines}.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{¿Qué es un spline?}
+Un spline es una función definida por tramos polinómicos que:
+\begin{itemize}
+\item interpola los datos,
+\item es continua en todo el intervalo,
+\item presenta suavidad en los nodos.
+\end{itemize}
+
+\medskip
+El spline más utilizado en práctica es el \textbf{spline cúbico}.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Spline cúbico}
+En cada intervalo $[x_i,x_{i+1}]$ el spline cúbico se define mediante
+un polinomio de grado 3, imponiendo:
+\begin{itemize}
+\item continuidad de la función,
+\item continuidad de la primera derivada,
+\item continuidad de la segunda derivada.
+\end{itemize}
+
+Estas condiciones garantizan una interpolación suave y estable.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Motivación de los splines}
+\begin{itemize}
+\item Evitan el fenómeno de Runge.
+\item Reducen la sensibilidad a perturbaciones en los datos.
+\item Presentan buen comportamiento numérico.
+\item Son adecuados para datos experimentales.
+\end{itemize}
+
+\medskip
+\begin{block}{}
+Los splines combinan estabilidad local y suavidad global.
+\end{block}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Comparación de métodos}
+\begin{center}
+\begin{tabular}{lccc}
+\textbf{Método} & \textbf{Suavidad} & \textbf{Estabilidad} & \textbf{Grado} \\
+\hline
+Polinomio global & Alta & Baja & Alto \\
+Lineal por tramos & Baja & Alta & 1 \\
+Spline cúbico & Alta & Alta & 3 \\
+\end{tabular}
+\end{center}
+Cuando el número de nodos crece o los datos contienen ruido,
+la interpolación por splines es preferible a la interpolación polinómica global.
+
+Interpolar bien no es solo elegir un método,
+sino entender sus limitaciones.
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%
+{
+  \setbeamercolor{background canvas}{bg=green!11}
+  \setbeamercolor{frametitle}{fg=black}
+%-------------------------------------------------
+\begin{frame}{Sobre comandos: ¿Qué hace el comando \texttt{spline} en Matlab?}
+%-------------------------------------------------
+%\begin{frame}{¿Qué hace el comando \texttt{spline} en Matlab?}
+El comando
+\[
+\texttt{yy = spline(x,y,xx)}
+\]
+construye un \textbf{spline cúbico interpolante}
+a partir de los datos $(x_i,y_i)$ y lo evalúa en los puntos \texttt{xx}.
+
+\medskip
+Dados nodos
+\[
+x_0 < x_1 < \cdots < x_n,
+\]
+el spline resultante es una función definida por tramos polinómicos
+que interpola exactamente los datos.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpretación matemática y propiedades}
+El spline cúbico construido por \texttt{spline} cumple:
+\begin{itemize}
+\item $s(x_i)=y_i$ para todos los nodos.
+\item $s(x)$ es continua en todo el intervalo.
+\item $s'(x)$ es continua en todo el intervalo.
+\item $s''(x)$ es continua en todo el intervalo.
+\item En cada subintervalo $[x_i,x_{i+1}]$,
+      $s(x)$ es un polinomio de grado 3.
+\end{itemize}
+
+\medskip
+Por defecto, Matlab impone condiciones de contorno naturales:
+\[
+s''(x_0)=s''(x_n)=0.
+\]
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Motivación y ventajas}
+\begin{itemize}
+\item Evita oscilaciones globales típicas de polinomios de alto grado.
+\item Reduce la sensibilidad a perturbaciones en los datos.
+\item Proporciona interpolaciones suaves y estables.
+\item Es adecuado para datos experimentales y aplicaciones prácticas.
+\end{itemize}
+
+\medskip
+\begin{block}{}
+El comando \texttt{spline} resuelve el compromiso
+entre suavidad y estabilidad numérica.
+\end{block}
+\end{frame}
+}
+
+%-------------------------------------------------
+\begin{frame}{Conclusiones}
+\begin{itemize}
+\item La interpolación permite reconstruir funciones a partir de datos.
+\item Existen varios métodos, con ventajas y limitaciones.
+\item El análisis de error y estabilidad es esencial.
+\end{itemize}
+
+\medskip
+Muchos métodos numéricos se basan en interpolar de forma inteligente.
+\end{frame}
+
+\section{Taylor vs Aproximación (Interpolación)}
+%-------------------------------------------------
+\begin{frame}{Teorema de aproximación de Taylor}
+Sea $f \in C^{n+1}(I)$ y sea $a \in I$.
+Entonces, para todo $x \in I$, se cumple:
+\[
+f(x)=f(a)+f'(a)(x-a)+\frac{f''(a)}{2!}(x-a)^2
++\cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n + R_{n+1}(x),
+\]
+donde el polinomio
+\[
+P_n(x)=\sum_{k=0}^{n}\frac{f^{(k)}(a)}{k!}(x-a)^k
+\]
+se denomina \emph{polinomio de Taylor de grado $n$ de $f$ en $a$}.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Término de error (resto de Taylor)}
+El término de error $R_{n+1}(x)$ viene dado por:
+\[
+R_{n+1}(x)=\frac{f^{(n+1)}(\xi)}{(n+1)!}(x-a)^{n+1},
+\quad \xi \in (a,x).
+\]
+
+\medskip
+En particular, el error de aproximación satisface:
+\[
+|f(x)-P_n(x)|
+\le
+\frac{\max_{\xi \in I}|f^{(n+1)}(\xi)|}{(n+1)!}|x-a|^{n+1}.
+\]
+
+\medskip
+Este resultado justifica el uso del polinomio de Taylor
+como aproximación local de la función.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Taylor vs Aproximación (Interpolación)}
+\textbf{Dos formas distintas de aproximar funciones}
+
+\medskip
+Aunque ambos métodos utilizan polinomios, la filosofía y el tipo de
+información que emplean son diferentes.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Aproximación de Taylor}
+\textbf{Idea}
+
+La aproximación de Taylor utiliza información \emph{local} de la función
+en un punto $a$:
+\begin{itemize}
+\item valores de la función,
+\item derivadas sucesivas en $a$.
+\end{itemize}
+
+\medskip
+El polinomio de Taylor aproxima bien a la función
+\textbf{cerca del punto de expansión}.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Interpolación polinómica}
+\textbf{Idea}
+
+La interpolación utiliza información \emph{discreta} de la función:
+\begin{itemize}
+\item valores conocidos en nodos $x_0,\dots,x_n$,
+\item sin usar derivadas.
+\end{itemize}
+
+\medskip
+El polinomio interpolante aproxima la función
+\textbf{en todo el intervalo de los nodos}.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Comparación conceptual}
+\begin{center}
+\begin{tabular}{lcc}
+\textbf{Aspecto} & \textbf{Taylor} & \textbf{Interpolación} \\
+\hline
+Tipo de información & Local (derivadas) & Discreta (datos) \\
+Punto clave & Un punto $a$ & Varios nodos \\
+Dominio de validez & Vecindad de $a$ & Intervalo completo \\
+Uso de datos & Analítico & Experimental / tabular \\
+\end{tabular}
+\end{center}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Error y comportamiento}
+\begin{itemize}
+\item En Taylor, el error depende de $|x-a|^{n+1}$:
+      la aproximación empeora al alejarse de $a$.
+\item En interpolación, el error depende de la elección de los nodos
+      y puede crecer en los extremos del intervalo.
+\end{itemize}
+
+\medskip
+Ambos métodos pueden fallar fuera de su zona natural de validez.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Estabilidad y sensibilidad}
+\begin{itemize}
+\item Taylor es estable mientras las derivadas estén bien controladas.
+\item La interpolación polinómica puede ser sensible a perturbaciones
+      en los datos.
+\item En presencia de ruido, Taylor no es aplicable
+      y la interpolación global puede ser inestable.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{¿Cuándo usar cada uno?}
+\begin{itemize}
+\item Usar \textbf{Taylor} cuando:
+\begin{itemize}
+\item se conoce la función analíticamente,
+\item interesan aproximaciones locales.
+\end{itemize}
+
+\item Usar \textbf{interpolación} cuando:
+\begin{itemize}
+\item solo se disponen de datos discretos,
+\item se quiere aproximar en un intervalo completo.
+\end{itemize}
+\end{itemize}
+Taylor aproxima funciones conocidas localmente;
+la interpolación aproxima funciones desconocidas globalmente.
+
+Son herramientas distintas para problemas distintos.
+\end{frame}
+
+
+\end{document}

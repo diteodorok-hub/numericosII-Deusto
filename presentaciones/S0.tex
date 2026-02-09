@@ -1,0 +1,204 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\title[Métodos Numéricos]{Introducción a los Métodos Numéricos}
+\subtitle{¿Por qué aproximamos?}
+\author{Nico 777}
+\institute{Universidad de Deusto\\ La vida es un camino largo, desafiante y desconocido. Vale la pena escuchar a alguien que la haya caminado ya con felicidad. San Ignacio}
+\date{\today}
+
+\begin{document}
+
+%------------------------------------------------
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+"Para aquellos que no conocen las matemáticas, es difícil sentir la belleza, la profunda belleza de la naturaleza… Si quieres aprender sobre la naturaleza, apreciar la naturaleza, es necesario aprender el lenguaje en el que habla". Feynman
+\end{frame}
+
+\begin{frame}{Motivación}
+En los cursos de Cálculo aprendemos a:
+\begin{itemize}
+\item Modelar datos con funciones 
+    \item Derivar funciones ``bonitas''
+    \item Calcular integrales exactas
+    \item Métodos para resolver EDO´s 
+\end{itemize}
+
+\vspace{0.3cm}
+
+Pero en la práctica:
+\begin{itemize}
+    \item No siempre conocemos la fórmula
+    \item Muchas integrales no se pueden calcular a mano
+    \item Los datos vienen de experimentos o simulaciones
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pregunta clave}
+\begin{center}
+\Large
+\textbf{¿Qué hacemos cuando no podemos calcular algo exactamente?}
+\end{center}
+
+\vspace{0.5cm}
+
+\pause
+\begin{center}
+\Huge
+\textbf{Lo aproximamos}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{¿Qué son los métodos numéricos?}
+Los métodos numéricos son técnicas para:
+\begin{itemize}
+    \item Aproximar soluciones de problemas matemáticos
+    \item Usando operaciones simples
+    \item Diseñadas para el computador
+\end{itemize}
+
+\vspace{0.3cm}
+
+\begin{block}{Idea central}
+Cuando no podemos resolver un problema exactamente,  
+lo resolvemos aproximadamente pero con error controlado. 
+Keys :aproximación, tiempo, error
+\end{block}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Derivación numérica}
+La derivada mide la pendiente de una recta.
+
+\vspace{0.3cm}
+
+Si conocemos valores de la función:
+\[
+f(x), \quad f(x+h)
+\]
+
+podemos aproximar:
+\[
+f'(x) \approx \frac{f(x+h)-f(x)}{h}
+\]
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item No necesitamos la fórmula exacta
+    \item Solo valores de la función
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]{Ejemplo MATLAB: derivada}
+\begin{verbatim}
+f = @(x) x.^2;
+x0 = 1;
+h = 0.01;
+
+df = (f(x0 + h) - f(x0)) / h;
+disp(df)
+\end{verbatim}
+
+\vspace{0.2cm}
+
+Valor exacto: \( f'(1) = 2 \)
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Integración numérica}
+Muchas integrales no tienen primitiva elemental.
+
+\vspace{0.3cm}
+
+Ejemplo:
+\[
+\int_0^1 e^{-x^2}\,dx
+\]
+
+\vspace{0.3cm}
+
+Idea:
+\begin{itemize}
+    \item Dividir el intervalo en partes pequeñas
+    \item Aproximar el área con figuras simples
+    \item Sumar todas las áreas
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile]{Ejemplo MATLAB: integral}
+\begin{verbatim}
+f = @(x) exp(-x.^2);
+x = linspace(0,1,100);
+y = f(x);
+
+I = trapz(x,y);
+disp(I)
+\end{verbatim}
+
+\vspace{0.2cm}
+
+Método del trapecio: suma áreas de trapecios.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{El papel del computador}
+El computador:
+\begin{itemize}
+    \item No sabe integrar ni derivar simbólicamente
+    \item Pero sabe sumar y repetir muy rápido
+\end{itemize}
+
+\vspace{0.3cm}
+
+\begin{block}{Conclusión}
+Los métodos numéricos traducen problemas matemáticos  
+a operaciones simples que el computador puede ejecutar.
+\end{block}
+
+"Estoy convencido de que cuando un científico examina problemas no científicos, puede ser tan listo o tan tonto como cualquier otro, y de que cuando habla de un asunto no científico, puede sonar igual de ingenuo que cualquier persona no impuesta en la materia".
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{¿Qué veremos en el curso?}
+\begin{itemize}
+    \item Interpolación
+    \item Derivación e integración numérica
+    \item Métodos iterativos
+    \item Resolución numérica de EDOs
+    \item Error, convergencia y estabilidad
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Mensaje final}
+\begin{center}
+"Es bien curioso, pero en las pocas ocasiones en que he sido requerido para tocar el bongo en público, al presentador nunca se le ocurrió mencionar que también me dedico a la física teórica. Pienso que esto puede deberse a que respetamos más las artes que las ciencias". Feynman.
+
+No te limites a copiar la marcha de los demás, descubre tu ritmo para caminar. No se llega a la meta repitiendo a otros, sino descubriendo y manteniendo tu propio estilo y tu paso. San Ignacio
+\end{center}
+\end{frame}
+
+\end{document}
