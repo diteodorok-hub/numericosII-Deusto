@@ -1,0 +1,291 @@
+\documentclass[11pt,a4paper]{article}
+
+%-------------------------------------------
+% Paquetes básicos
+%-------------------------------------------
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\geometry{margin=2.5cm}
+
+%-------------------------------------------
+% Entorno para ejercicios
+%-------------------------------------------
+\newtheoremstyle{ejercicio}
+  {10pt}   % espacio arriba
+  {10pt}   % espacio abajo
+  {\normalfont}
+  {}
+  {\bfseries}
+  {.}
+  {0.5em}
+  {}
+
+\theoremstyle{ejercicio}
+\newtheorem{ejercicio}{Ejercicio}
+
+%-------------------------------------------
+\title{Guía de Ejercicio I:\\Oda a la Interpolación}
+\author{nICO no IKO 777}
+
+\date{}
+
+%-------------------------------------------
+\begin{document}
+
+\maketitle
+\textit{El primer principio es que no debes engañarte a ti mismo y eres la persona más fácil de engañar. Una vez que no te engañas a ti mismo, es fácil que no engañes a los otros científicos.}  R.  Feynman.
+
+%%%%%%%%%%%
+\section*{Indicaciones para el desarrollo y la entrega}
+
+\begin{itemize}
+
+\item \textbf{Formato de entrega.}  
+La entrega debe realizarse exclusivamente en formato PDF,
+generado a partir de un documento escrito en \LaTeX.
+No se aceptarán entregas en formato Word u otros editores.
+
+\item \textbf{Presentación.}  
+Sea ordenado y claro en la redacción.  
+Incluya demostraciones completas en los ejercicios teóricos
+y explique adecuadamente los resultados obtenidos en los ejercicios prácticos.
+Las gráficas deben estar correctamente rotuladas y comentadas.
+
+\item \textbf{Plazo de entrega.}  
+El plazo es de \textbf{dos semanas contadas a partir del 20/02/2026}.  
+La fecha límite de entrega es el \textbf{06/03/2026}. 
+
+\item \textbf{Uso de consultas.}  
+Pueden realizar consultas durante el desarrollo de la guía.
+Con todo gusto los orientaré.
+
+\item \textbf{Clase de apoyo.}  
+El martes 24 utilizaremos la clase para resolver ejercicios
+y discutir dificultades comunes.  
+Si es necesario, podremos organizar una clase adicional optativa
+para profundizar en los temas más complejos.
+
+\item \textbf{Uso de Inteligencia Artificial.}  
+Se permite el uso de herramientas de IA como apoyo.
+Sin embargo, deben ser plenamente conscientes de lo que están haciendo.
+La IA puede cometer errores o generar argumentos incorrectos.
+Usted es responsable del contenido que entrega.
+
+\end{itemize}
+
+%%%%%%%%%%%
+
+\section*{Parte I -- Ejercicios Teóricos}
+%[Unicidad del polinomio interpolante]
+\begin{ejercicio}
+Sea $\{(x_i,y_i)\}_{i=0}^n$ un conjunto de nodos con $x_i$ distintos.
+
+\begin{enumerate}[label=\alph*)]
+\item Demuestre que existe un único polinomio $p \in \mathbb{P}_n$ tal que
+\[
+p(x_i)=y_i, \quad i=0,\dots,n.
+\]
+
+Sugerencia: Suponga que existen dos polinomios $p$ y $q$
+que interpolan los mismos datos y estudie el polinomio $r=p-q$.
+
+\item Concluya utilizando el hecho de que un polinomio no nulo
+de grado $\le n$ no puede tener más de $n$ raíces.
+\end{enumerate}
+\end{ejercicio}
+
+%-------------------------------------------
+%[Fórmula del error de interpolación]
+\begin{ejercicio}
+Sea $f \in C^{n+1}([a,b])$ y sea $p_n$ su polinomio interpolante
+en nodos $x_0,\dots,x_n$.
+
+\begin{enumerate}[label=\alph*)]
+\item Demuestre que el error puede escribirse como
+\[
+f(x)-p_n(x)=
+\frac{f^{(n+1)}(\xi_x)}{(n+1)!}
+\prod_{i=0}^n (x-x_i)
+\]
+para algún $\xi_x \in (a,b)$.
+
+\item Indique en qué parte del argumento se utiliza el teorema de Rolle.
+
+\item Discuta qué ocurre si los nodos están muy próximos entre sí.
+\end{enumerate}
+\end{ejercicio}
+
+
+%[Los polinomios de Lagrange forman una base]
+\begin{ejercicio}
+
+Sean $x_0,\dots,x_n$ nodos distintos y sean los polinomios fundamentales
+de Lagrange definidos por
+
+\[
+\ell_i(x)=
+\prod_{\substack{0 \le j \le n \\ j \ne i}}
+\frac{x-x_j}{x_i-x_j},
+\quad i=0,\dots,n.
+\]
+
+\begin{enumerate}[label=\alph*)]
+
+\item Demuestre que
+\[
+\ell_i(x_j)=\delta_{ij},
+\]
+donde $\delta_{ij}$ es el delta de Kronecker.
+
+\item Pruebe que el conjunto $\{\ell_0,\dots,\ell_n\}$ es linealmente independiente.
+
+\item Concluya que $\{\ell_0,\dots,\ell_n\}$ forma una base del espacio
+$\mathbb{P}_n$ de los polinomios de grado menor o igual que $n$.
+
+\item Compare esta base con la base canónica
+\[
+\{1,x,x^2,\dots,x^n\}.
+\]
+¿Qué ventaja tiene la base de Lagrange en el contexto de interpolación?
+
+\end{enumerate}
+
+\end{ejercicio}
+
+
+%-------------------------------------------
+\section*{Parte II -- Ejercicios Prácticos}
+% [Interpolación de Newton con datos reales]
+\begin{ejercicio}
+Implementar la interpolación de Newton a partir de datos experimentales.
+
+\begin{enumerate}[label=\alph*)]
+\item Cargar un archivo CSV con dos columnas numéricas.
+\item Agrupar los datos si existen nodos repetidos.
+\item Construir la tabla de diferencias divididas.
+\item Evaluar el polinomio interpolante.
+\item Dibujar el polinomio junto con los datos originales.
+\item Construir un spline cúbico con los mismos datos.
+\item ¿Cuál método recomendaría en la práctica? Justifique.
+\item Cosntruya una situacion donde a los datos originales, le agregas, nuevos datos e interpolas.
+\end{enumerate}
+
+%\textbf{Extensión:} Escalar la variable independiente y comparar resultados.
+\end{ejercicio}
+
+%-------------------------------------------
+% [Sensibilidad frente a perturbaciones]
+\begin{ejercicio}
+Estudiar la sensibilidad del polinomio interpolante.
+
+\begin{enumerate}[label=\alph*)]
+\item Perturbar un solo dato $y_k$ en una cantidad pequeña $\delta$.
+\item Construir el nuevo polinomio interpolante.
+\item Dibujar la diferencia
+\[
+|p(x)-\tilde{p}(x)|.
+\]
+\item Comparar la magnitud de la perturbación con el error máximo obtenido.
+%\item Concluir si el problema es bien o mal condicionado.
+\end{enumerate}
+\end{ejercicio}
+
+%-------------------------------------------
+% [Aproximantes de Padé y comparación con interpolación]
+\begin{ejercicio}
+Aproximantes de Padé.\\
+Sea $f$ una función analítica en un entorno de $x=0$, con desarrollo de Taylor
+
+\[
+f(x)=\sum_{k=0}^{\infty} a_k x^k.
+\]
+
+\begin{enumerate}[label=\alph*)]
+
+\item \textbf{Definición.}
+Defina el aproximante de Padé $[m/n]_f(x)$ como una función racional
+
+\[
+R_{m,n}(x)=\frac{P_m(x)}{Q_n(x)},
+\]
+
+donde $P_m$ y $Q_n$ son polinomios de grado $\le m$ y $\le n$
+respectivamente, con $Q_n(0)=1$, tal que
+
+\[
+f(x)-R_{m,n}(x)=\mathcal{O}(x^{m+n+1})
+\quad \text{cuando } x \to 0.
+\]
+
+\begin{itemize}
+\item Entienda la definición con un ejemplo
+\item Explique en qué sentido este aproximante ``coincide'' con la serie de Taylor.
+\end{itemize}
+\bigskip
+
+\item \textbf{Construcción algorítmica.}
+A partir de los coeficientes $a_0,\dots,a_{m+n}$,
+deduzca el sistema lineal que permite calcular los coeficientes
+de $Q_n(x)$ y posteriormente los de $P_m(x)$.
+
+Implemente un algoritmo en Python o Matlab que:
+
+\begin{itemize}
+\item Entienda el problema con un ejemplo (Todo lo que sigue a continuación, lo puede hacer con el ejemplo)
+\item reciba como entrada los coeficientes de Taylor, 
+\item construya el aproximante $[m/n]$,
+\item evalúe la función racional obtenida.
+\end{itemize}
+
+\bigskip
+
+\item \textbf{Comparación con interpolación polinómica.}
+
+Considere la función
+\[
+f(x)=e^x \quad \text{o} \quad f(x)=\frac{1}{1+x^2}.
+\]
+
+\begin{enumerate}
+\item Construya el polinomio de Taylor de orden $m+n$. (Puede hacerlo con un ejemplo)
+\item Construya el aproximante de Padé $[m/n]$.
+\item Dibuje ambos aproximantes en un intervalo adecuado.
+\item Compare visualmente el comportamiento cerca del origen y lejos de él.
+\end{enumerate}
+
+\bigskip
+
+\item \textbf{Discusión del error.}
+
+\begin{enumerate}
+\item Analice el error absoluto
+\[
+|f(x)-R_{m,n}(x)|
+\quad \text{y} \quad
+|f(x)-T_{m+n}(x)|.
+\]
+
+\item ¿En qué regiones el aproximante de Padé presenta menor error?
+
+\item Discuta por qué los aproximantes racionales pueden capturar mejor
+comportamientos asintóticos o singularidades que los polinomios.
+
+\item Relacione este comportamiento con el fenómeno de Runge
+y la estabilidad numérica.
+\end{enumerate}
+
+\end{enumerate}
+
+\end{ejercicio}
+
+
+
+
+\end{document}
