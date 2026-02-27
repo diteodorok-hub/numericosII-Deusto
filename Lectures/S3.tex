@@ -1,0 +1,2101 @@
+\documentclass[12pt,oneside]{book}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{multicol}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdftitle={Guía de Métodos Numéricos II},
+    pdfauthor={Antonio Di Teodoro}
+}
+
+% -----------------------
+% ELIMINAR NOMBRE DEL CAPÍTULO EN PIE DE PÁGINA
+% -----------------------
+\pagestyle{fancy}
+\fancyhf{}               % limpia encabezado y pie
+\fancyfoot[C]{\thepage}  % solo número de página centrado
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\newtheorem{definition}{Definición}[chapter]
+\newtheorem{theorem}{Teorema}[chapter]
+\newtheorem{lemma}{Lema}[chapter]
+\newtheorem{corollary}{Corolario}[chapter]
+\newtheorem{proposition}{Proposición}[chapter]
+\newtheorem{example}{Ejemplo}[chapter]
+\newtheorem{remark}{Remark}[chapter]
+
+\begin{document}
+
+\title{
+\Huge Aproximación de Funciones \\
+\vspace{0.5cm}
+\Large Curso de Métodos Numéricos II
+}
+
+\author{
+Antonio Di Teodoro
+}
+
+\date{\today}
+
+\maketitle
+\thispagestyle{empty}
+\clearpage
+
+\tableofcontents
+\clearpage
+
+\chapter{Análisis del Problema de Mínimos Cuadrados}
+
+\section{Espacios con Producto Interno: Una breve, brevidísima oda a los espacios de Hilbert.}
+
+\textit{Todo espacio de Hilbert es, ante todo, un espacio de Banach, pero con un "corazón" más rico. Su magia reside en que toda sucesión de Cauchy converge dentro del mismo espacio.}
+
+\begin{definition}
+Sea $V$ un espacio vectorial real. Un producto interno es una aplicación
+\[
+\langle \cdot,\cdot \rangle : V\times V \to \mathbb{R}
+\]
+que es bilineal, simétrica y definida positiva.
+\end{definition}
+
+\noindent La norma inducida es
+\[
+\|v\| = \sqrt{\langle v,v\rangle}.
+\]
+
+
+
+%%%%%%%%%%
+
+\section{El Espacio $L^2(a,b)$}
+Esto lo van a discutir más adelante; esto es solo una probadita.(esto no es objetivo del curso)
+\subsection{Motivación}
+
+En cursos anteriores trabajaron con vectores en $\mathbb{R}^n$ y el producto interno
+
+\[
+\langle \mathbf{u},\mathbf{v}\rangle
+=
+\sum_{i=1}^n u_i v_i.
+\]
+
+\noindent Ahora queremos hacer algo similar, pero con funciones en lugar de vectores. La idea fundamental es:
+
+\begin{center}
+\textit{Una función puede pensarse como un vector infinito dimensional.}
+\end{center}
+
+\noindent El producto interno pasa de ser una suma a ser una integral.
+
+\subsection{Definición}
+
+\begin{definition}
+El espacio $L^2(a,b)$ es el conjunto de funciones $f:(a,b)\to\mathbb{R}$ tales que
+
+\[
+\int_a^b |f(x)|^2 dx < \infty.
+\]
+\end{definition}
+
+\noindent Es decir, funciones cuyo cuadrado es integrable.
+
+\subsection{Producto Interno}
+
+En $L^2(a,b)$ definimos
+
+\[
+\langle f,g\rangle
+=
+\int_a^b f(x)g(x)\,dx.
+\]
+
+\subsection{Propiedades}
+
+Para $f,g,h \in L^2(a,b)$ y $\alpha\in\mathbb{R}$:
+
+\begin{itemize}
+\item Linealidad:
+\[
+\langle \alpha f + g, h\rangle
+=
+\alpha \langle f,h\rangle
++
+\langle g,h\rangle.
+\]
+
+\item Simetría:
+\[
+\langle f,g\rangle = \langle g,f\rangle.
+\]
+
+\item Positividad:
+\[
+\langle f,f\rangle
+=
+\int_a^b f(x)^2 dx
+\ge 0.
+\]
+
+\item Definida positiva:
+\[
+\langle f,f\rangle = 0
+\iff f=0 \textbf{ (casi en todas partes)}.
+\]
+\end{itemize}
+
+\subsection{Norma Inducida}
+
+\begin{center}
+Casta diosa, que plateas\\
+Casta Diva, che inargenti\\
+
+Estos sagrados y antiguos árboles\\
+Queste sacre antiche piante\\
+
+A nosotros vuelve tu hermoso semblante\\
+Al noi volgi il bel sembiante\\
+
+Sin nube y sin velo\\
+Senza nube e senza vel\\
+
+\href{https://www.youtube.com/watch?v=s-TwMfgaDC8}
+{Link: Casta Diva}
+
+\end{center}
+
+
+La norma asociada es
+
+\[
+\|f\|_{L^2}
+=
+\left(
+\int_a^b f(x)^2 dx
+\right)^{1/2}.
+\]
+
+\noindent Interpretación:
+
+\begin{center}
+La norma $L^2$ mide la ``energía'' de la función.
+\end{center}
+
+
+\begin{remark}[Interpretación energética de la norma $L^2$]
+Observemos que la cantidad
+
+\[
+\int_a^b |f(x)|^2 dx
+\]
+
+es la integral del cuadrado de la función.
+
+En muchos modelos físicos, la energía es proporcional al
+cuadrado de una magnitud.
+
+Por ejemplo:
+
+\begin{itemize}
+\item En vibraciones: la energía cinética es proporcional al cuadrado de la velocidad.
+\item En electricidad: la potencia disipada es proporcional al cuadrado de la corriente.
+\item En ondas: la energía transportada es proporcional al cuadrado de la amplitud.
+\end{itemize}
+
+Por ello, la cantidad
+
+\[
+\|f\|_{L^2}^2
+=
+\int_a^b |f(x)|^2 dx
+\]
+
+se interpreta como la energía total asociada a la función $f$.
+
+Desde el punto de vista geométrico, esta norma generaliza la
+longitud euclidiana:
+
+\[
+\|\mathbf{v}\|^2
+=
+\sum v_i^2
+\quad \longrightarrow \quad
+\|f\|_{L^2}^2
+=
+\int f(x)^2 dx.
+\]
+
+Es decir, la suma discreta de cuadrados se convierte en una suma continua.
+\end{remark}
+
+\subsection{Ortogonalidad}
+
+Decimos que $f$ y $g$ son ortogonales si
+
+\[
+\int_a^b f(x)g(x)\,dx=0.
+\]
+
+\noindent Esto generaliza el concepto de perpendicularidad en $\mathbb{R}^n$.
+
+\begin{example}[Ejemplo de Norma]
+
+Consideremos el intervalo $[-1,1]$.
+
+Sea:
+
+\[
+f(x)=x,
+\quad
+g(x)=1.
+\]
+
+Calculamos el producto interno:
+
+\[
+\langle f,g\rangle
+=
+\int_{-1}^{1} x \cdot 1 \, dx
+=
+\int_{-1}^{1} x \, dx.
+\]
+
+Como la función es impar en un intervalo simétrico:
+
+\[
+\int_{-1}^{1} x\,dx = 0.
+\]
+
+Por tanto,
+
+\[
+\langle f,g\rangle=0.
+\]
+
+
+Así, las funciones $1$ y $x$ son ortogonales en $L^2(-1,1)$.
+\end{example}
+
+\begin{example}[Ejemplo de Norma]
+
+Sea
+
+\[
+f(x)=x.
+\]
+
+Entonces:
+
+\[
+\|f\|_{L^2}^2
+=
+\int_{-1}^{1} x^2 dx
+=
+\left[ \frac{x^3}{3} \right]_{-1}^{1}
+=
+\frac{2}{3}.
+\]
+
+Por tanto:
+
+\[
+\|f\|_{L^2}
+=
+\sqrt{\frac{2}{3}}.
+\]
+\end{example}
+
+
+\section{Teorema de Proyección}
+
+\begin{theorem}[Proyección Ortogonal]
+Sea $V$ un espacio de Hilbert y $W\subset V$ subespacio cerrado finito dimensional.
+Para todo $f\in V$ existe único $p\in W$ tal que
+\[
+\|f-p\| = \min_{w\in W}\|f-w\|.
+\]
+Además,
+\[
+f-p \perp W.
+\]
+\end{theorem}
+
+\begin{proof}
+IDEA: Sea $\{w_1,\dots,w_n\}$ base de $W$.  
+Buscamos $p=\sum c_i w_i$.  
+La condición de mínimo implica
+\[
+\frac{d}{dc_k}\|f-p\|^2=0.
+\]
+Esto produce
+\[
+\langle f-p,w_k\rangle=0.
+\]
+La matriz de Gram es \underline{definida positiva}, garantizando unicidad.
+Donde :
+
+\begin{definition}[Matriz de Gram]
+Sea $(V,\langle \cdot,\cdot \rangle)$ un espacio con producto interno
+y sea $\{v_1,\dots,v_n\}\subset V$ un conjunto de vectores.
+
+La \textbf{matriz de Gram} asociada a este conjunto es la matriz
+$G\in\mathbb{R}^{n\times n}$ definida por
+
+\[
+G_{ij}
+=
+\langle v_i, v_j\rangle,
+\quad i,j=1,\dots,n.
+\]
+
+Es decir,
+
+\[
+G=
+\begin{pmatrix}
+\langle v_1,v_1\rangle & \langle v_1,v_2\rangle & \cdots & \langle v_1,v_n\rangle \\
+\langle v_2,v_1\rangle & \langle v_2,v_2\rangle & \cdots & \langle v_2,v_n\rangle \\
+\vdots & \vdots & \ddots & \vdots \\
+\langle v_n,v_1\rangle & \langle v_n,v_2\rangle & \cdots & \langle v_n,v_n\rangle
+\end{pmatrix}.
+\]
+\end{definition}
+\end{proof}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+\section{Problema "Discreto" de Mínimos Cuadrados}
+
+\subsection{Planteamiento}
+
+Dado un conjunto de datos
+\[
+(x_i, y_i), \quad i=1,\dots,m,
+\]
+queremos aproximar mediante una función
+\[
+\phi(x) = \sum_{j=0}^{n} c_j \varphi_j(x),
+\]
+minimizando el error cuadrático:
+
+\[
+S(c_0,\dots,c_n) = \sum_{i=1}^{m} 
+\left( y_i - \phi(x_i) \right)^2.
+\]
+
+\begin{definition}
+Una aproximación de mínimos cuadrados discreta es aquella que minimiza la suma de los errores cuadrados.
+\[
+\min_{\mathbf{c}} \|A\mathbf{c}-\mathbf{y}\|_2^2.
+\]
+\end{definition}
+
+%\subsection{Forma matricial}
+%
+%Sea
+%
+%\[
+%A_{ij} = \varphi_j(x_i), 
+%\quad 
+%\mathbf{c} = (c_0,\dots,c_n)^T,
+%\quad
+%\mathbf{y} = (y_1,\dots,y_m)^T.
+%\]
+%
+%Entonces el problema equivale a:
+%
+%\[
+%\min_{\mathbf{c}} \|A\mathbf{c}-\mathbf{y}\|_2^2.
+%\]
+
+\section{Ecuaciones Normales}
+
+\begin{theorem}
+El vector $\mathbf{c}$ minimiza $\|A\mathbf{c}-\mathbf{y}\|_2$ si y sólo si satisface las ecuaciones normales:
+\[
+A^T A \mathbf{c} = A^T \mathbf{y}.
+\]
+\end{theorem}
+
+\begin{proof}
+Sea 
+\[
+\Phi(\mathbf{c}) = \|A\mathbf{c}-\mathbf{y}\|_2^2.
+\]
+Entonces
+
+\[
+\nabla \Phi(\mathbf{c}) = 2 A^T (A\mathbf{c}-\mathbf{y}).
+\]
+
+La condición necesaria de mínimo es
+
+\[
+A^T (A\mathbf{c}-\mathbf{y}) = 0,
+\]
+
+lo que implica
+
+\[
+A^T A \mathbf{c} = A^T \mathbf{y}.
+\]
+\end{proof}
+
+\begin{corollary}
+Si $A$ tiene rango completo, entonces $A^TA$ es definida positiva y el problema tiene solución única.
+\end{corollary}
+%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+%%%%%%%%%%%%%%%%%
+\section{Interpretación Geométrica}
+
+\begin{theorem}
+La solución de mínimos cuadrados es la proyección ortogonal de $\mathbf{y}$ sobre el subespacio columna de $A$.
+\end{theorem}
+
+\begin{proof}
+El residuo $\mathbf{r}=A\mathbf{c}-\mathbf{y}$ satisface
+\[
+A^T\mathbf{r}=0.
+\]
+Por tanto, $\mathbf{r}$ es ortogonal al espacio generado por las columnas de $A$.
+\end{proof}
+
+\section{Caso Continuo: Por ahora cultura general}
+
+Sea $f\in L^2[a,b]$ y buscamos aproximar por
+\[
+p_n(x)=\sum_{j=0}^{n} c_j \varphi_j(x).
+\]
+
+\noindent Definimos el error cuadrático continuo:
+
+\[
+E(c)=\int_a^b 
+\left( f(x)-p_n(x) \right)^2 dx.
+\]
+
+\begin{definition}
+La mejor aproximación en norma $L^2$ es aquella que minimiza $E(c)$.
+\end{definition}
+
+\begin{theorem}
+Los coeficientes satisfacen
+\[
+\sum_{j=0}^{n} c_j 
+\langle \varphi_j, \varphi_k \rangle
+=
+\langle f, \varphi_k \rangle,
+\quad k=0,\dots,n.
+\]
+\end{theorem}
+
+\begin{proof}
+Derivando $E(c)$ respecto a cada $c_k$ y anulando.
+\end{proof}
+
+
+\begin{remark}
+En realidad
+\[
+V_n=\mathrm{span}\{\varphi_0,\dots,\varphi_n\}
+\subset L^2(a,b),
+\]
+donde las funciones $\varphi_j$ son linealmente independientes y pertenecen a $L^2(a,b)$.
+
+El problema es: 
+
+Buscamos $p_n\in V_n$ tal que
+
+\[
+\|f-p_n\|_{L^2}
+=
+\min_{v\in V_n} \|f-v\|_{L^2}.
+\]
+
+Escribimos $
+p_n(x)=\sum_{j=0}^{n} c_j \varphi_j(x).
+$
+Para luego
+\[
+E(\mathbf{c})
+=
+\int_a^b 
+\left(
+f(x)-\sum_{j=0}^n c_j \varphi_j(x)
+\right)^2 dx.
+\]
+
+
+\begin{center}
+\underline{Musicalmente, esta parte luce así:}
+
+\href{https://www.youtube.com/watch?v=zUT730G-xvA}
+{Link}
+\end{center}
+
+\end{remark}
+
+
+\section{Formulación del Problema via matrices }
+
+Sea $A \in \mathbb{R}^{m\times n}$ con $m>n$ y $y\in\mathbb{R}^m$.
+El problema de mínimos cuadrados consiste en resolver
+
+\[
+\min_{\mathbf{c}\in\mathbb{R}^n} 
+\|A\mathbf{c}-\mathbf{y}\|_2^2.
+\]
+
+\noindent Este problema aparece cuando el sistema lineal
+
+\[
+A\mathbf{c}=\mathbf{y}
+\]
+
+\noindent es sobredeterminado y, en general, no tiene solución exacta.
+
+\section{Definición de Norma Euclidiana}
+
+\begin{definition}
+La norma euclidiana en $\mathbb{R}^m$ está dada por
+
+\[
+\|\mathbf{v}\|_2
+=
+\left(
+\sum_{i=1}^{m} v_i^2
+\right)^{1/2}
+=
+\sqrt{\mathbf{v}^T\mathbf{v}}.
+\]
+\end{definition}
+
+\begin{definition}
+\noindent La norma inducida por el producto interno estándar
+
+\[
+\langle \mathbf{u},\mathbf{v}\rangle
+=
+\mathbf{u}^T\mathbf{v}
+\]
+
+\noindent es precisamente la norma euclidiana.
+\end{definition}
+
+\noindent Por tanto,
+
+\[
+\|A\mathbf{c}-\mathbf{y}\|_2^2
+=
+(A\mathbf{c}-\mathbf{y})^T(A\mathbf{c}-\mathbf{y}).
+\]
+
+\section{Desarrollo del Funcional Cuadrático}
+
+Definimos
+
+\[
+\Phi(\mathbf{c})
+=
+\|A\mathbf{c}-\mathbf{y}\|_2^2.
+\]
+
+\noindent Expandimos:
+
+\[
+\Phi(\mathbf{c})
+=
+\mathbf{c}^T A^T A \mathbf{c}
+-
+2 \mathbf{c}^T A^T \mathbf{y}
++
+\mathbf{y}^T\mathbf{y}.
+\]
+
+\noindent Por otro lado. Recordemos:
+
+\[
+\nabla_{\mathbf{c}} 
+(\mathbf{c}^T B \mathbf{c})
+=
+2B\mathbf{c}
+\quad
+\text{si } B \text{ es simétrica}.
+\]
+
+\noindent Entonces:
+
+\[
+\nabla \Phi(\mathbf{c})
+=
+2A^TA\mathbf{c}
+-
+2A^T\mathbf{y}.
+\]
+
+\noindent La condición de mínimo es
+
+\[
+\nabla \Phi(\mathbf{c})=0.
+\]
+
+Por tanto:
+
+\[
+A^TA\mathbf{c}=A^T\mathbf{y}.
+\]
+
+Estas son las \textbf{ecuaciones normales}.
+
+\begin{remark}[Gradiente de una Forma Cuadrática]
+aaa
+
+
+
+Sea $B \in \mathbb{R}^{n\times n}$ y sea
+
+\[
+\phi(\mathbf{c})
+=
+\mathbf{c}^T B \mathbf{c},
+\quad
+\mathbf{c}\in\mathbb{R}^n.
+\]
+
+Ahora. Escribimos explícitamente:
+
+\[
+\phi(\mathbf{c})
+=
+\sum_{i=1}^n \sum_{j=1}^n 
+c_i B_{ij} c_j.
+\]
+
+Derivamos respecto a $c_k$:
+
+\[
+\frac{\partial \phi}{\partial c_k}
+=
+\sum_{j=1}^n B_{kj} c_j
++
+\sum_{i=1}^n c_i B_{ik}.
+\]
+
+La primera suma corresponde al caso $i=k$,
+la segunda al caso $j=k$.
+
+En forma matricial:
+
+\[
+\nabla \phi(\mathbf{c})
+=
+B\mathbf{c}
++
+B^T\mathbf{c}.
+\]
+
+Así
+
+\begin{theorem}
+Para toda matriz $B$ se cumple:
+
+\[
+\nabla_{\mathbf{c}} 
+(\mathbf{c}^T B \mathbf{c})
+=
+(B + B^T)\mathbf{c}.
+\]
+\end{theorem}
+
+\begin{proof}
+Derivación componente a componente como arriba.
+\end{proof}
+
+%\subsection{Caso Particular: $B$ Simétrica}
+
+Caso particular, si $B=B^T$, entonces:
+
+\[
+\nabla_{\mathbf{c}} 
+(\mathbf{c}^T B \mathbf{c})
+=
+2B\mathbf{c}.
+\]
+
+
+Finalmente. Observemos que:
+
+\[
+\mathbf{c}^T B \mathbf{c}
+=
+\mathbf{c}^T 
+\left(\frac{B+B^T}{2}\right)
+\mathbf{c}.
+\]
+
+Es decir, la forma cuadrática sólo depende de la parte simétrica de $B$.
+La parte antisimétrica no contribuye.
+
+
+\end{remark}
+
+\section{Interpretación Geométrica}
+
+Sea $\mathcal{R}(A)$ el espacio columna de $A$.
+
+\begin{theorem}
+La solución $\hat{\mathbf{c}}$ satisface que
+
+\[
+A\hat{\mathbf{c}}
+=
+\operatorname{proj}_{\mathcal{R}(A)} \mathbf{y}.
+\]
+
+Es decir, es la proyección ortogonal de $\mathbf{y}$ sobre el subespacio generado por las columnas de $A$.\\
+{\bf La solución de mínimos cuadrados es la proyección ortogonal de $\mathbf{y}$ sobre el subespacio columna de $A$.}
+\end{theorem}
+
+\begin{proof}
+Sea el vector $r$ (llamada residuo en algunas culturas modulares)
+
+\[
+\mathbf{r}
+=
+\mathbf{y}-A\hat{\mathbf{c}}.
+\]
+
+Las ecuaciones normales implican
+
+\[
+A^T\mathbf{r}=0.
+\]
+
+Esto significa que
+
+\[
+\mathbf{r}\perp \mathcal{R}(A).
+\]
+
+Por definición de proyección ortogonal en espacios euclidianos, el único vector del subespacio cuya diferencia con $\mathbf{y}$ es ortogonal al subespacio es la proyección.
+\end{proof}
+
+\begin{definition}
+
+
+Si $A$ tiene rango completo (con $u_1,\dots, u_k$ no necesariamente ortogonal),
+
+\[
+P
+=
+A(A^TA)^{-1}A^T
+\]
+
+es el operador de proyección ortogonal sobre $\mathcal{R}(A)$.
+
+Propiedades:
+
+\[
+P^2=P,
+\quad
+P^T=P.
+\]
+
+\end{definition}
+
+Esto es una descomposición ortogonal tipo Pitágoras.
+
+\section{Dibujo Geométrico (usamos: TikZ)}
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2]
+
+\draw[->] (0,0) -- (4,0);
+\draw[->] (0,0) -- (0,3);
+
+\draw[thick] (0,0) -- (3,1.2);
+\draw[dashed] (3,1.2) -- (3,2.5);
+
+\draw[thick,->] (0,0) -- (3,2.5);
+\draw[thick,->] (0,0) -- (3,1.2);
+
+\draw (3,2.7) node {$\mathbf{y}$};
+\draw (3.2,1.2) node {$A\hat{\mathbf{c}}$};
+\draw (3.2,2) node {$\mathbf{r}$};
+
+\end{tikzpicture}
+\end{center}
+
+El plano horizontal representa $\mathcal{R}(A)$.
+$\mathbf{y}$ es el vector original.
+$A\hat{\mathbf{c}}$ es su proyección.
+$\mathbf{r}$ es el vector ortogonal.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2, >=Latex]
+
+% Plano Col(A)
+\draw[thick] (-0.5,0) -- (5,0);
+\node at (4.8,-0.3) {$\mathrm{Col}(A)$};
+
+% Subespacio ortogonal
+\draw[thick] (0,0) -- (0,4);
+\node at (-0.6,3.8) {$\mathrm{Col}(A)^\perp$};
+
+% Vector y (azul)
+\draw[thick,->,blue] (0,0) -- (3,2.8);
+\node[blue] at (3.2,2.8) {$\mathbf{y}$};
+
+% Proyección y_hat (rojo horizontal)
+\draw[thick,->,red] (0,0) -- (3,0);
+\node[red] at (3,-0.4) {$\hat{\mathbf{y}}$};
+
+% Residuo (rojo vertical)
+\draw[thick,->,red] (3,0) -- (3,2.8);
+\draw (3.2,2) node {$\mathbf{r}$};
+
+% Rectángulo punteado
+\draw[dashed] (0,2.8) -- (3,2.8);
+\draw[dashed] (3,0) -- (3,2.8);
+
+% Etiqueta proyección
+\node at (5.2,1.5) 
+{$\hat{\mathbf{y}}=\mathrm{proj}_{\mathrm{Col}(A)}(\mathbf{y})$};
+
+\end{tikzpicture}
+
+$\mathcal{R}(A)=\mathrm{Col}(A)$
+
+\end{center}
+
+
+%
+
+
+\begin{theorem}
+Si $A$ tiene rango completo,
+\[
+A^TAx=A^Tb
+\]
+tiene solución única.
+\end{theorem}
+
+\begin{proof}
+$A^TA$ es simétrica y
+\[
+x^TA^TAx=\|Ax\|^2>0.
+\]
+\end{proof}
+
+\section*{Estabilidad y Condición}
+
+\begin{definition}
+El número de condición es
+\[
+\kappa(A)=\|A\|\|A^{-1}\|.
+\]
+\end{definition}
+
+\begin{theorem}
+Para mínimos cuadrados,
+\[
+\kappa(A^TA)=\kappa(A)^2.
+\]
+\end{theorem}
+
+\begin{proof}
+Si $\sigma_i$ son valores singulares,
+\[
+\kappa(A)=\frac{\sigma_{\max}}{\sigma_{\min}},
+\quad
+\kappa(A^TA)=\frac{\sigma_{\max}^2}{\sigma_{\min}^2}.
+\]
+\end{proof}
+
+\textbf{resolver con ecuaciones normales empeora el condicionamiento.}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Sobre la resolución estable del problema de mínimos cuadrados en numérico}
+
+Resolver mediante ecuaciones normales implica trabajar con $A^TA$,
+lo cual puede deteriorar el número de condición:
+
+\[
+\kappa(A^TA)=\kappa(A)^2.
+\]
+
+Por ello, en práctica se prefiere QR o SVD.\\
+
+
+
+%---------------------------------
+\subsection*{Descomposición QR}
+
+\subsection*{Idea}
+
+Descomponemos la matriz como
+
+\[
+A = QR
+\]
+
+donde:
+
+\begin{itemize}
+\item $Q \in \mathbb{R}^{m\times n}$ tiene columnas ortonormales:
+\[
+Q^TQ = I.
+\]
+\item $R \in \mathbb{R}^{n\times n}$ es triangular superior.
+\end{itemize}
+
+\subsection*{Aplicación a mínimos cuadrados}
+
+Queremos minimizar
+
+\[
+\|QR\mathbf{c}-\mathbf{y}\|.
+\]
+
+\noindent Multiplicamos por $Q^T$:
+
+\[
+\|R\mathbf{c}-Q^T\mathbf{y}\|.
+\]
+
+\noindent  El problema se reduce a resolver el sistema triangular:
+
+\[
+R\mathbf{c}=Q^T\mathbf{y}.
+\]
+
+\subsection*{Ventaja}
+
+\begin{itemize}
+\item No se forma $A^TA$.
+\item Mejor estabilidad numérica.
+\item Costo computacional moderado.
+\end{itemize}
+
+%---------------------------------
+\subsection*{Descomposición en Valores Singulares (SVD)}
+
+\subsection*{Idea}
+
+Toda matriz puede escribirse como:
+
+\[
+A = UB V^T
+\]
+
+donde:
+
+\begin{itemize}
+\item $U$ y $V$ son ortogonales.
+\item $B$ es diagonal con valores singulares $\sigma_i$.
+\end{itemize}
+
+\subsection*{Aplicación a mínimos cuadrados}
+
+La solución viene dada por:
+
+\[
+\mathbf{c}
+=
+V B^{-1} U^T \mathbf{y}.
+\]
+
+\subsection*{Interpretación}
+
+\begin{itemize}
+\item Los $\sigma_i$ indican cuánto "estira" la matriz en cada dirección.
+\item Si algún $\sigma_i$ es muy pequeño → problema mal condicionado.
+\end{itemize}
+
+\subsection*{Ventajas}
+
+\begin{itemize}
+\item Método más estable.
+\item Permite detectar dependencia lineal.
+\item Base de la pseudoinversa de Moore–Penrose.
+\end{itemize}
+
+\section{Comparación}
+
+\begin{center}
+\begin{tabular}{c|c|c}
+Método & Estabilidad & Uso recomendado \\
+\hline
+Ecuaciones normales & Baja & Ejemplos pequeños \\
+QR & Buena & Uso estándar \\
+SVD & Excelente & Problemas mal condicionados \\
+\end{tabular}
+\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Modelos Aplicados}
+%\section{Ejemplo: Ajuste Lineal}
+\begin{example}[Modelo Logístico (Población]
+Ajustar
+\[
+y \approx c_0 + c_1 x.
+\]
+
+Se obtiene el sistema:
+
+\[
+\begin{cases}
+\displaystyle m c_0 + \left(\sum x_i\right)c_1 = \sum y_i \\
+\displaystyle \left(\sum x_i\right)c_0 + \left(\sum x_i^2\right)c_1 = \sum x_i y_i
+\end{cases}
+\]
+\end{example}
+
+Así, si :
+
+\[
+P(t)=\frac{K}{1+Ae^{-rt}}.
+\]
+
+Linealización:
+
+\[
+\ln\left(\frac{K}{P}-1\right) = -rt + \ln A.
+\]
+
+Se ajusta por mínimos cuadrados lineales.
+
+\begin{example}[Trazadores en Transferencia de Calor]
+
+Modelo 1D:
+
+\[
+u_t = \alpha u_{xx}.
+\]
+
+Medición experimental:
+
+\[
+u(x_i,t_j)\approx \sum c_k \phi_k(x_i).
+\]
+
+La estimación de $\alpha$ puede realizarse por regresión minimizando el error entre modelo y datos.
+\end{example}
+
+
+\begin{remark}
+Todos los ejemplos están en los códigos de MATLAB, en la carpeta de GitHub, incluido el archivo .tex de este PDF
+
+\href{https://github.com/diteodorok-hub/numericosII-Deusto}
+{github:}
+\end{remark}
+
+%%%%%%%%%%%%%
+
+\chapter{Polinomios Ortogonales}
+
+\section{Construcción General}
+
+\begin{theorem}[Gram-Schmidt]
+Dado $\{1,x,x^2,\dots\}$ en $L^2_w(a,b)$,
+existe sucesión ortogonal $\{P_n\}$.
+\end{theorem}
+
+\begin{proof}
+Aplicar Gram-Schmidt usando
+\[
+\langle f,g\rangle_w=\int_a^b f(x)g(x)w(x)dx.
+\]
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{remark}[¿Por qué introducir un peso?]
+
+Podríamos definir el producto interno simplemente como
+
+\[
+\langle f,g\rangle
+=
+\int_a^b f(x)g(x)\,dx,
+\]
+
+lo cual corresponde al caso particular $w(x)=1$.
+
+Sin embargo, introducir una función peso $w(x)>0$
+permite definir una geometría más general en el espacio funcional.
+
+El peso determina qué regiones del intervalo
+tienen mayor influencia en el producto interno
+y conduce a distintas familias de polinomios ortogonales.
+
+Por ejemplo:
+
+\begin{itemize}
+\item $w(x)=1$ produce los polinomios de Legendre.
+\item $w(x)=\frac{1}{\sqrt{1-x^2}}$ produce los polinomios de Chebyshev.
+\item $w(x)=e^{-x^2}$ produce los polinomios de Hermite.
+\end{itemize}
+
+Cada elección del peso define una estructura geométrica diferente.
+\end{remark}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%{Relación de Recurrencia}
+\section*{Relación de Recurrencia de Tres Términos}
+\begin{theorem}\label{tho22}
+Todo sistema de polinomios ortogonales que para todo $n\ge1$ existen escalares reales $\alpha_n$ y $\beta_n>0$ que satisface
+\[
+P_{n+1}(x)=(x-\alpha_n)P_n(x)-\beta_n P_{n-1}(x).
+\]
+\end{theorem}
+
+
+\begin{remark}[Importancia de la relación de recurrencia]
+
+La relación de tres términos no es solo una propiedad algebraica.
+Tiene consecuencias fundamentales:
+
+\begin{itemize}
+\item Permite construir los polinomios ortogonales
+de manera recursiva y eficiente.
+\item Impone una estructura tridiagonal
+a la matriz asociada al operador multiplicación por $x$.
+\item Permite calcular los nodos de cuadratura de Gauss
+mediante un problema de autovalores.
+\item Conecta con la teoría espectral
+de operadores autoadjuntos.
+\end{itemize}
+
+En consecuencia, esta relación es la pieza central
+de la teoría computacional de los polinomios ortogonales.
+\end{remark}
+
+
+Retornando al teorema: Para todo $n\ge1$ existen escalares reales $\alpha_n$ y $\beta_n>0$ tales que
+
+\[
+P_{n+1}(x)
+=
+(x-\alpha_n)P_n(x)
+-
+\beta_n P_{n-1}(x).
+\]
+
+\subsection*{La Idea Intuitiva es:}
+
+El polinomio $xP_n(x)$ tiene grado $n+1$.  
+Por tanto pertenece al espacio
+
+\[
+\mathrm{span}\{P_0,\dots,P_{n+1}\}.
+\]
+
+\noindent La ortogonalidad forzará que solo aparezcan tres términos.\\
+
+\noindent Demostración Detallada  del teorema \ref{tho22}
+
+Como $\{P_k\}$ es base ortogonal,
+
+\[
+xP_n
+=
+\sum_{k=0}^{n+1} a_k P_k.
+\]
+
+Queremos ver qué coeficientes son distintos de cero.
+
+Tomemos producto interno con $P_m$, para $m\le n-2$:
+
+\[
+\langle xP_n, P_m\rangle_w.
+\]
+
+Usando simetría del producto interno:
+
+\[
+\langle xP_n, P_m\rangle_w
+=
+\langle P_n, xP_m\rangle_w.
+\]
+
+Pero $xP_m$ tiene grado $m+1\le n-1$.  
+Como $P_n$ es ortogonal a todos los polinomios de grado menor que $n$,
+
+\[
+\langle P_n, xP_m\rangle_w = 0.
+\]
+
+Por tanto:
+
+\[
+a_m=0 \quad \text{si } m\le n-2.
+\]
+
+Entonces:
+
+\[
+xP_n
+=
+a_{n+1}P_{n+1}
++
+a_n P_n
++
+a_{n-1}P_{n-1}.
+\]
+
+Reordenando obtenemos:
+
+\[
+P_{n+1}
+=
+(x-\alpha_n)P_n
+-
+\beta_n P_{n-1}.
+\]
+
+donde
+
+\[
+\alpha_n = \frac{\langle xP_n,P_n\rangle}{\langle P_n,P_n\rangle},
+\quad
+\beta_n =
+\frac{\langle P_n,P_n\rangle}{\langle P_{n-1},P_{n-1}\rangle}.
+\]
+
+\section*{Estructura Tridiagonal}
+
+\begin{definition}
+Una matriz $J\in\mathbb{R}^{n\times n}$ es tridiagonal si
+
+\[
+J_{ij}=0
+\quad
+\text{cuando }
+|i-j|>1.
+\]
+
+Es decir, solo tiene elementos distintos de cero en:
+
+\begin{itemize}
+\item la diagonal principal,
+\item la diagonal superior inmediata,
+\item la diagonal inferior inmediata.
+\end{itemize}
+\end{definition}
+
+En forma matricial:
+
+\[
+J=
+\begin{pmatrix}
+\alpha_0 & \sqrt{\beta_1} & 0 & \cdots \\
+\sqrt{\beta_1} & \alpha_1 & \sqrt{\beta_2} & \cdots \\
+0 & \sqrt{\beta_2} & \alpha_2 & \cdots \\
+\vdots & & & \ddots
+\end{pmatrix}.
+\]
+
+\section{Polinomios de Legendre}
+
+\begin{definition}[Fórmula de Rodrigues]
+Los polinomios de Legendre $\{P_n\}_{n\ge 0}$ se definen por
+
+\[
+P_n(x)
+=
+\frac{1}{2^n n!}
+\frac{d^n}{dx^n}
+\left( (x^2-1)^n \right),
+\qquad x\in[-1,1].
+\]
+\end{definition}
+
+\begin{theorem}[Ortogonalidad de Legendre]
+Para $m\neq n$ se cumple
+
+\[
+\int_{-1}^{1}
+P_n(x)P_m(x)\,dx
+=
+0.
+\]
+
+\noindent Es decir, los polinomios de Legendre son ortogonales en $[-1,1]$ respecto al peso $w(x)=1$.
+\end{theorem}
+
+\begin{proof}
+Sea $m<n$ sin pérdida de generalidad.
+
+Usamos la fórmula de Rodrigues:
+
+\[
+P_n(x)
+=
+\frac{1}{2^n n!}
+\frac{d^n}{dx^n}(x^2-1)^n.
+\]
+
+Consideremos
+
+\[
+I=
+\int_{-1}^{1}
+P_n(x)P_m(x)\,dx.
+\]
+
+Sustituimos la expresión de $P_n$:
+
+\[
+I=
+\frac{1}{2^n n!}
+\int_{-1}^{1}
+\frac{d^n}{dx^n}(x^2-1)^n
+\, P_m(x)\,dx.
+\]
+
+Integramos por partes $n$ veces.
+
+En cada integración por partes:
+
+\begin{itemize}
+\item Las derivadas se transfieren a $P_m(x)$.
+\item Los términos de borde se anulan.
+\end{itemize}
+
+¿Por qué se anulan los términos de borde?
+
+Porque $(x^2-1)^n$ tiene ceros de orden $n$ en $x=\pm1$,
+por lo que todas sus derivadas hasta orden $n-1$ también se anulan en los extremos.
+
+Después de integrar por partes $n$ veces obtenemos:
+
+\[
+I
+=
+\frac{(-1)^n}{2^n n!}
+\int_{-1}^{1}
+(x^2-1)^n
+\frac{d^n}{dx^n}P_m(x)
+\,dx.
+\]
+
+Pero $P_m$ es un polinomio de grado $m<n$,
+por lo tanto
+
+\[
+\frac{d^n}{dx^n}P_m(x)=0.
+\]
+
+Luego:
+
+\[
+I=0.
+\]
+
+Esto prueba la ortogonalidad.
+\end{proof}
+
+\begin{remark}
+Un codigo interensante para construir legendre: \href{http://www.sc.ehu.es/sbweb/fisica3/especial/legendre/legendre.html}{Link}
+\end{remark}
+
+
+%%%%%%%%%%%
+
+\section{Ejemplo Da vinci: Ortogonalidad Discreta de Funciones Trigonométricas}
+
+Consideremos el producto escalar discreto definido por
+
+\[
+\langle f,g\rangle_d
+=
+\sum_{k=0}^{N-1}
+f(x_k)g(x_k),
+\]
+
+donde los puntos están igualmente espaciados en $[0,2\pi)$:
+
+\[
+x_k = \frac{2\pi k}{N},
+\quad k=0,\dots,N-1.
+\]
+
+\subsection*{Objetivo}
+
+Verificar que las funciones
+
+\[
+f(x)=\cos(mx),
+\qquad
+g(x)=\cos(nx),
+\]
+
+son ortogonales si $m\neq n$.
+
+\subsection*{Cálculo}
+
+Calculamos:
+
+\[
+\langle \cos(mx),\cos(nx)\rangle_d
+=
+\sum_{k=0}^{N-1}
+\cos(mx_k)\cos(nx_k).
+\]
+
+Usamos la identidad trigonométrica:
+
+\[
+\cos A \cos B
+=
+\frac{1}{2}
+\left[
+\cos(A-B)
++
+\cos(A+B)
+\right].
+\]
+
+Entonces:
+
+\[
+=
+\frac{1}{2}
+\sum_{k=0}^{N-1}
+\left[
+\cos((m-n)x_k)
++
+\cos((m+n)x_k)
+\right].
+\]
+
+Separando:
+
+\[
+=
+\frac{1}{2}
+\left[
+\sum_{k=0}^{N-1}
+\cos((m-n)x_k)
++
+\sum_{k=0}^{N-1}
+\cos((m+n)x_k)
+\right].
+\]
+
+\subsection*{Suma Fundamental}
+
+Si $p$ es un entero distinto de 0 módulo $N$, se cumple:
+
+\[
+\sum_{k=0}^{N-1}
+\cos\left(\frac{2\pi p k}{N}\right)=0.
+\]
+
+Por tanto, si $m\neq n$ y $m+n \not\equiv 0 \ (\mathrm{mod}\ N)$,
+
+\[
+\langle \cos(mx),\cos(nx)\rangle_d=0.
+\]
+
+\subsection*{Caso Particular}
+
+Tomemos $N=4$ y comparemos:
+
+\[
+f(x)=\cos(x),
+\quad
+g(x)=\cos(2x).
+\]
+
+Los nodos son:
+
+\[
+0,\frac{\pi}{2},\pi,\frac{3\pi}{2}.
+\]
+
+Evaluamos:
+
+\[
+\cos(x_k)=
+(1,0,-1,0),
+\]
+
+\[
+\cos(2x_k)=
+(1,-1,1,-1).
+\]
+
+Producto punto:
+
+\[
+1\cdot1
++
+0\cdot(-1)
++
+(-1)\cdot1
++
+0\cdot(-1)
+=
+1+0-1+0=0.
+\]
+
+
+\begin{center}
+\underline{Ah! Mes amis de La fille du regiment (Gaetano Donizetti):}\\
+\vspace{1cm}
+Ah! Mes amis, quel jour de fête!\\
+Je vais marcher sous vos drapeaux\\
+L'amour, qui m'a tourné la tête\\
+Désormais me rend un héros\\
+Ah! Quel bonheur, oui, mes amis\\
+Je vais marcher sous vos drapeaux!\\
+Qui, celle pour qui je respire\\
+A mes voeux a daigné sourire\\
+Et ce doux espoir de bonheur\\
+Trouble ma raison et man coeur! Ah!\\
+
+\href{https://www.youtube.com/watch?v=5HbdOI7x0U4&list=PLiZOQMGHZ2KfonVZ1x2nPkz_xz_dv0mB7&index=9}
+{A mes amis}
+\end{center}
+
+%%%%%%%%%
+\begin{multicols}{2}
+\section{Repaso: Aritmética Modular}
+
+\subsection*{División con Resto}
+
+Recordemos que dados dos enteros $a$ y $N>0$, 
+existen únicos enteros $q$ y $r$ tales que
+
+\[
+a = qN + r,
+\quad
+0 \le r < N.
+\]
+
+El número $r$ se llama el \textbf{resto} de dividir $a$ entre $N$.
+
+
+
+\subsection*{Definición de Congruencia Modular}
+
+\begin{definition}
+Decimos que dos enteros $a$ y $b$ son congruentes módulo $N$ si
+
+\[
+a-b \text{ es múltiplo de } N.
+\]
+
+Se escribe:
+
+\[
+a \equiv b \pmod{N}.
+\]
+\end{definition}
+
+Equivalentemente, \begin{align}
+a \equiv b \pmod{N}
+\end{align}
+Si y solo si $a$ y $b$  tienen el mismo resto al dividir por  N.
+
+
+
+\begin{example}
+Tomemos $N=5$.
+
+\[
+12 = 2\cdot 5 + 2.
+\]
+
+\[
+7 = 1\cdot 5 + 2.
+\]
+
+Ambos tienen resto 2, entonces:
+
+\[
+12 \equiv 7 \pmod{5}.
+\]
+\end{example}
+
+
+\begin{example}
+Tomemos $N=4$.
+
+\[
+6 = 1\cdot 4 + 2,
+\quad
+10 = 2\cdot 4 + 2.
+\]
+
+Por tanto:
+
+\[
+6 \equiv 10 \pmod{4}.
+\]
+
+
+\subsection*{Interpretación de $p \not\equiv 0 \pmod{N}$}
+
+Decir que
+
+\[
+p \not\equiv 0 \pmod{N}
+\]
+
+significa que:
+
+\begin{itemize}
+\item $p$ no es múltiplo de $N$.
+\item El resto de dividir $p$ entre $N$ no es cero.
+\end{itemize}
+\end{example}
+
+\begin{example}
+Sea $N=6$.
+
+\[
+p=12.
+\]
+
+Como
+
+\[
+12=2\cdot 6,
+\]
+
+entonces:
+
+\[
+12 \equiv 0 \pmod{6}.
+\]
+
+Pero si
+
+\[
+p=8,
+\]
+
+\[
+8=1\cdot6+2,
+\]
+
+entonces:
+
+\[
+8 \not\equiv 0 \pmod{6}.
+\]
+\end{example}
+
+\end{multicols}
+%%%%%%%%%
+\section{Ejemplo Mozart: Construcción de los Primeros Polinomios Ortogonales en $[-1,1]$}
+
+Consideremos el espacio $L^2(-1,1)$ con peso
+
+\[
+w(x)=1.
+\]
+
+El producto interno es:
+
+\[
+\langle f,g\rangle
+=
+\int_{-1}^{1} f(x)g(x)\,dx.
+\]
+
+Partimos de la base monomial:
+
+\[
+\{1,x,x^2,x^3,\dots\}.
+\]
+
+Aplicaremos el proceso de Gram--Schmidt.
+
+%-------------------------------------------------
+\subsection*{Primer polinomio}
+
+Tomamos
+
+\[
+P_0(x)=1.
+\]
+
+Calculamos su norma:
+
+\[
+\langle 1,1\rangle
+=
+\int_{-1}^{1} 1\,dx
+=
+2.
+\]
+
+%-------------------------------------------------
+\subsection*{Segundo polinomio}
+
+Definimos:
+
+\[
+\widetilde{P}_1(x)=x
+-
+\frac{\langle x,1\rangle}{\langle 1,1\rangle}.
+\]
+
+Calculamos:
+
+\[
+\langle x,1\rangle
+=
+\int_{-1}^{1} x\,dx.
+\]
+
+Como la función es impar en intervalo simétrico:
+
+\[
+\int_{-1}^{1} x\,dx=0.
+\]
+
+Por tanto:
+
+\[
+P_1(x)=x.
+\]
+
+Norma:
+
+\[
+\langle x,x\rangle
+=
+\int_{-1}^{1} x^2 dx
+=
+\left[\frac{x^3}{3}\right]_{-1}^{1}
+=
+\frac{2}{3}.
+\]
+
+%-------------------------------------------------
+\subsection*{Tercer polinomio}
+
+Definimos:
+
+\[
+\widetilde{P}_2(x)
+=
+x^2
+-
+\frac{\langle x^2,1\rangle}{\langle1,1\rangle}
+-
+\frac{\langle x^2,x\rangle}{\langle x,x\rangle}x.
+\]
+
+Calculamos las integrales.
+
+Primero:
+
+\[
+\langle x^2,1\rangle
+=
+\int_{-1}^{1} x^2 dx
+=
+\frac{2}{3}.
+\]
+
+Segundo:
+
+\[
+\langle x^2,x\rangle
+=
+\int_{-1}^{1} x^3 dx
+=
+0
+\quad \text{(función impar)}.
+\]
+
+Entonces:
+
+\[
+\widetilde{P}_2(x)
+=
+x^2
+-
+\frac{\frac{2}{3}}{2}.
+\]
+
+Simplificando:
+
+\[
+\widetilde{P}_2(x)
+=
+x^2-\frac{1}{3}.
+\]
+
+Por tanto:
+
+\[
+P_2(x)=x^2-\frac{1}{3}.
+\]
+
+%-------------------------------------------------
+\subsection*{Verificación de Ortogonalidad}
+
+Verificamos que:
+
+\[
+\langle P_2,1\rangle
+=
+\int_{-1}^{1}
+\left(x^2-\frac{1}{3}\right) dx.
+\]
+
+Separando:
+
+\[
+=
+\int_{-1}^{1} x^2 dx
+-
+\frac{1}{3}
+\int_{-1}^{1}1 dx.
+\]
+
+\[
+=
+\frac{2}{3}
+-
+\frac{1}{3}\cdot 2
+=
+0.
+\]
+
+También:
+
+\[
+\langle P_2,x\rangle
+=
+\int_{-1}^{1}
+\left(x^2-\frac{1}{3}\right)x dx.
+\]
+
+\[
+=
+\int_{-1}^{1} x^3 dx
+-
+\frac{1}{3}
+\int_{-1}^{1} x dx
+=
+0.
+\]
+
+Luego $P_2$ es ortogonal a $P_0$ y $P_1$.
+
+%-------------------------------------------------
+\subsection*{Relación con Polinomios de Legendre}
+
+Observemos que
+
+\[
+P_2(x)
+=
+x^2-\frac{1}{3}
+=
+\frac{1}{3}(3x^2-1).
+\]
+
+El polinomio
+
+\[
+L_2(x)=\frac{1}{2}(3x^2-1)
+\]
+
+es el polinomio de Legendre de grado 2.
+
+Por tanto, los polinomios construidos son proporcionales a los polinomios de Legendre.
+
+\section*{... Fourier !!!!}
+
+\begin{center}
+\textit{
+Fourier enseñó a los matemáticos que toda vibración esconde una armonía
+y que detrás del caos aparente vive una suma ordenada de ondas.
+Muchos lo buscan sin saberlo; otros lo reconocen en cada señal.
+Nosotros, por ahora, apenas estamos preparando el oído:
+la sinfonía completa llegará más adelante.}
+
+Para que la espera no sea tan larga: 
+\href{https://www.youtube.com/watch?v=MvRMfR2c1hY}{Rameau}
+\end{center}
+
+Si $w(x)=1$ en $[-\pi,\pi]$,
+la base ortogonal es
+\[
+\{1,\cos nx,\sin nx\}.
+\]
+
+La expansión
+
+\[
+f\sim \sum c_n \phi_n
+\]
+
+es la proyección en espacio infinito dimensional.
+
+% bonito , pero no
+
+%\begin{theorem}[Convergencia en $L^2$]
+%La serie de Fourier converge en norma $L^2$.
+%\end{theorem}
+% bonito , pero no
+%\section*{Interpretación Espectral}
+%Los polinomios ortogonales son eigenfunciones de operadores autoadjuntos (Sturm-Liouville).
+
+
+\section{¿Son Ortogonales los Polinomios de Lagrange?}
+
+\subsection{Definición}
+
+Dado un conjunto de nodos distintos
+
+\[
+x_0,x_1,\dots,x_n,
+\]
+
+los polinomios de Lagrange se definen como
+
+\[
+\ell_k(x)
+=
+\prod_{\substack{j=0 \\ j\neq k}}^{n}
+\frac{x-x_j}{x_k-x_j}.
+\]
+
+Satisfacen la propiedad fundamental:
+
+\[
+\ell_k(x_j)=\delta_{kj}.
+\]
+
+Es decir, cada polinomio vale 1 en su nodo y 0 en los demás.
+
+\subsection{Teorema}
+
+En general, los polinomios de Lagrange no son ortogonales en $L^2(a,b)$ respecto a ningún peso continuo estándar.
+
+\subsection{Demostración (Contraejemplo)}
+
+Consideremos el intervalo $[-1,1]$ y dos nodos:
+
+\[
+x_0=-1,
+\quad
+x_1=1.
+\]
+
+Los polinomios de Lagrange son:
+
+\[
+\ell_0(x)=\frac{x-1}{-2}=\frac{1-x}{2},
+\]
+
+\[
+\ell_1(x)=\frac{x+1}{2}.
+\]
+
+Calculamos su producto interno en $L^2(-1,1)$:
+
+\[
+\langle \ell_0,\ell_1\rangle
+=
+\int_{-1}^{1}
+\frac{1-x}{2}
+\frac{x+1}{2}
+dx.
+\]
+
+Multiplicamos:
+
+\[
+=
+\frac{1}{4}
+\int_{-1}^{1}
+(1-x^2)
+dx.
+\]
+
+Calculamos la integral:
+
+\[
+\int_{-1}^{1} (1-x^2)dx
+=
+\int_{-1}^{1}1dx
+-
+\int_{-1}^{1}x^2dx.
+\]
+
+\[
+=2-\frac{2}{3}
+=
+\frac{4}{3}.
+\]
+
+Entonces:
+
+\[
+\langle \ell_0,\ell_1\rangle
+=
+\frac{1}{4}\cdot\frac{4}{3}
+=
+\frac{1}{3}
+\neq 0.
+\]
+
+\textbf{Conclusión:}
+
+Los polinomios de Lagrange no son ortogonales en $L^2(-1,1)$.
+
+\begin{center}
+\vspace{1cm}
+\textit{Cuando el cansancio aprieta, cualquiera se desalienta. A veces toca caminar de noche y las estrellas no se ven, ¡pero todas están ahí! No cambies la buena dirección por un desaliento}\\ San  Ignacio de Loyola 
+\end{center}
+
+\chapter{Bibliografía Avanzada}
+
+\begin{itemize}
+\item Trefethen -- Approximation Theory and Approximation Practice.
+\item Cheney -- Introduction to Approximation Theory.
+\item Atkinson -- Numerical Analysis.
+\item Szegő -- Orthogonal Polynomials.
+\item Boyd -- Chebyshev and Fourier Spectral Methods.
+\end{itemize}
+
+
+
+\end{document}
