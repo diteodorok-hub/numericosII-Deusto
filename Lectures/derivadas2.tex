@@ -1,0 +1,1008 @@
+\documentclass[12pt,a4paper]{article}
+
+% ------------------------------------------------
+% Codificación y lenguaje
+% ------------------------------------------------
+\usepackage[utf8]{inputenc}      % Codificación UTF-8
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{lmodern}
+
+% ------------------------------------------------
+% Márgenes y formato
+% ------------------------------------------------
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+% ------------------------------------------------
+% Matemáticas
+% ------------------------------------------------
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+
+% Entornos de teorema
+\newtheorem{teorema}{Teorema}[section]
+\newtheorem{proposicion}[teorema]{Proposición}
+\newtheorem{lema}[teorema]{Lema}
+\newtheorem{corolario}[teorema]{Corolario}
+\theoremstyle{definition}
+\newtheorem{definicion}[teorema]{Definición}
+\theoremstyle{remark}
+\newtheorem{observacion}[teorema]{Observación}
+
+% ------------------------------------------------
+% Gráficos y tablas
+% ------------------------------------------------
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+
+% ------------------------------------------------
+% Código MATLAB
+% ------------------------------------------------
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegray}{gray}{0.95}
+\definecolor{codegreen}{rgb}{0,0.5,0}
+\definecolor{codeblue}{rgb}{0,0,0.6}
+
+\lstdefinestyle{matlabstyle}{
+    language=Matlab,
+    backgroundcolor=\color{codegray},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue}\bfseries,
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color{red},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numbersep=5pt,
+    tabsize=2,
+    showstringspaces=false
+}
+
+\lstset{style=matlabstyle}
+
+% ------------------------------------------------
+% Hipervínculos
+% ------------------------------------------------
+\usepackage[hidelinks]{hyperref}
+
+% ------------------------------------------------
+% Comandos útiles
+% ------------------------------------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Ogrande}{\mathcal{O}}
+\newcommand{\eps}{\varepsilon}
+
+% ------------------------------------------------
+% Documento
+% ------------------------------------------------
+\title{Derivación Numérica}
+\author{Nico Iko 777}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+Cuidado: La guía no está exenta de errores !!!
+
+
+\section{Derivación numérica}
+
+En muchos problemas científicos la función $f(x)$ no está disponible de forma analítica,
+sino únicamente a través de valores en una malla
+
+\[
+x_0, x_1, x_2, \dots , x_n .
+\]
+
+En estas situaciones la derivada debe aproximarse utilizando los valores conocidos
+de la función. Este procedimiento se conoce como \textbf{derivación numérica}.
+
+Sea $h$ el tamaño de paso de la malla uniforme
+
+\[
+x_i = x_0 + ih .
+\]
+
+La idea fundamental consiste en aproximar la derivada mediante combinaciones
+lineales de valores de la función evaluados en puntos cercanos.
+
+
+En cálculo numérico:
+\begin{itemize}
+\item No podemos tomar el límite.
+\item Solo disponemos de valores discretos $f(x_i)$.
+\item Los datos pueden provenir de mediciones experimentales.
+\end{itemize}
+
+Por tanto, sustituimos el límite por un cociente incremental con $h$ pequeño pero finito.\\
+
+Muchos métodos numéricos dependen de un parámetro $h$ (tamaño de paso). 
+Si conocemos cómo se comporta el error respecto a $h$, podemos combinar 
+aproximaciones con distintos valores de $h$ para eliminar el término 
+dominante del error.
+
+\subsection{Aproximación básica}
+
+A partir de la definición de derivada
+
+\[
+f'(x)=\lim_{h\to0}\frac{f(x+h)-f(x)}{h}
+\]
+
+se obtiene la aproximación más simple
+
+\[
+f'(x) \approx \frac{f(x+h)-f(x)}{h}.
+\]
+
+Esta aproximación tiene error de truncamiento
+
+\[
+O(h).
+\]
+
+El objetivo de los métodos de derivación numérica es construir fórmulas con
+errores más pequeños utilizando más puntos de la malla.
+
+
+%%%%%%%%%%%%%%%%%%%%%
+
+\section{Fórmulas de diferencias para la primera derivada}
+
+Las fórmulas de derivación numérica se obtienen a partir de expansiones de Taylor
+de la función alrededor del punto de interés.
+
+
+Sea $f$ suficientemente suave. Entonces
+
+\[
+f(x+h) = f(x) + h f'(x) + \frac{h^2}{2}f''(x) + \frac{h^3}{6}f^{(3)}(x) + \cdots
+\]
+
+A partir de esta expansión se diseñan las fórmulas.
+
+\subsection{Diferencia hacia adelante}
+
+Si se conocen los valores de la función en $x$ y $x+h$, se obtiene
+
+\[
+f'(x) \approx
+\frac{f(x+h)-f(x)}{h},
+\]
+
+con error
+
+\[
+O(h).
+\]
+
+Una aproximación de mayor precisión utiliza tres puntos
+
+\[
+x,\; x+h,\; x+2h
+\]
+
+y está dada por
+
+\[
+f'(x) \approx
+\frac{-3f(x)+4f(x+h)-f(x+2h)}{2h},
+\]
+
+con error
+
+\[
+O(h^2).
+\]
+
+\subsection{Diferencia hacia atrás}
+
+De forma análoga, utilizando los puntos
+
+\[
+x,\; x-h,\; x-2h
+\]
+
+se obtiene
+
+\[
+f'(x) \approx
+\frac{3f(x)-4f(x-h)+f(x-2h)}{2h},
+\]
+
+con error
+
+\[
+O(h)= \frac{h^2 f^{(3)}(\xi)}{2}
+\]
+
+
+
+
+\subsection{Diferencia centrada}
+
+Las fórmulas centradas utilizan información a ambos lados del punto.
+
+La aproximación más común es
+
+\[
+f'(x) \approx
+\frac{f(x+h)-f(x-h)}{2h},
+\]
+
+con error
+
+
+\[
+O(h^2)= \frac{h^2 f^{(3)}(\xi)}{6}
+\]
+
+
+
+
+\subsubsection*{Ejemplo 2: Comparación}
+
+Sea $f(x)=e^x$, en $x=0$.
+
+\[
+f'(0)=1.
+\]
+
+\textbf{Diferencia hacia adelante:}
+
+\[
+D_h^+ f(0)=\frac{e^h-1}{h}.
+\]
+
+Usando Taylor:
+
+\[
+\frac{e^h-1}{h}
+=
+1 + \frac{h}{2} + O(h^2).
+\]
+
+Error $\sim \frac{h}{2}$.
+
+\bigskip
+
+\textbf{Diferencia centrada:}
+
+\[
+D_h^c f(0)=\frac{e^h-e^{-h}}{2h}.
+\]
+
+Desarrollando:
+
+\[
+=
+1 + \frac{h^2}{6} + O(h^4).
+\]
+
+Error $\sim \frac{h^2}{6}$.
+
+\bigskip
+
+Para $h=10^{-2}$:
+
+\[
+\text{Error adelante} \sim 5\times 10^{-3},
+\]
+\[
+\text{Error centrado} \sim 1.6\times 10^{-5}.
+\]
+
+La mejora es significativa.
+
+\subsection{Fórmula centrada de orden $O(h^4)$}
+
+Si se utilizan cinco puntos
+
+\[
+x-2h,\;x-h,\;x,\;x+h,\;x+2h,
+\]
+
+se obtiene la aproximación
+
+\[
+f'(x) \approx
+\frac{-f(x+2h)+8f(x+h)-8f(x-h)+f(x-2h)}{12h},
+\]
+
+con error de truncamiento
+
+
+\[
+O(h^4)= \frac{h^4 f^{(5)}(\xi)}{30}
+\]
+
+Esta fórmula se obtiene combinando las expansiones de Taylor de
+$f(x\pm h)$ y $f(x\pm2h)$ de forma que se cancelen los términos
+de error de menor orden.
+
+
+
+
+
+\subsection*{Diferencia hacia adelante de orden $O(h^4)$}
+
+Cuando no se dispone de puntos a la izquierda del punto de evaluación,
+se pueden utilizar fórmulas hacia adelante. Usando cinco puntos se obtiene
+una aproximación de orden cuatro.
+
+Sea $h>0$ y supongamos que conocemos los valores de la función en los puntos
+
+\[
+x,\; x+h,\; x+2h,\; x+3h,\; x+4h.
+\]
+
+La derivada puede aproximarse mediante
+
+\[
+f'(x) \approx 
+\frac{-25f(x) + 48f(x+h) - 36f(x+2h) + 16f(x+3h) - 3f(x+4h)}{12h}.
+\]
+
+
+
+\subsubsection*{Ejemplo}
+
+Sea
+
+\[
+f(x)=\sin x
+\]
+
+y queremos aproximar la derivada en $x=1$.
+
+Sabemos que
+
+\[
+f'(x)=\cos x.
+\]
+
+Tomando $h=0.1$ y aplicando la fórmula anterior obtenemos
+
+\[
+f'(1) \approx
+\frac{-25f(1)+48f(1.1)-36f(1.2)+16f(1.3)-3f(1.4)}{12(0.1)}.
+\]
+
+El valor exacto es
+
+\[
+f'(1)=\cos(1).
+\]
+
+La aproximación numérica presenta un error del orden $O(h^4)$,
+mucho menor que las fórmulas de orden $O(h)$ o $O(h^2)$.
+
+\subsection{Número de puntos y orden de precisión}
+
+\begin{center}
+\begin{tabular}{ccc}
+\hline
+Método & Puntos utilizados & Error \\ \hline
+Forward & $x,x+h$ & $O(h)$ \\
+Forward & $x,x+h,x+2h$ & $O(h^2)$ \\
+Backward & $x,x-h,x-2h$ & $O(h^2)$ \\
+Centered & $x-h,x,x+h$ & $O(h^2)$ \\
+Centered & $x-2h,x-h,x,x+h,x+2h$ & $O(h^4)$ \\
+Centered & $x-3h,\dots,x+3h$ & $O(h^6)$ \\
+\hline
+\end{tabular}
+\end{center}
+
+
+\section{Extrapolación de Richardson}
+
+La extrapolación de Richardson es una técnica que permite aumentar el orden
+de precisión de una aproximación numérica utilizando cálculos con diferentes
+valores del paso $h$.
+
+Supongamos que una aproximación de la derivada tiene la forma
+
+\[
+D(h) = f'(x) + C h^p + O(h^{p+1}).
+\]
+
+Si se calcula la misma aproximación con paso $h/2$
+
+\[
+D(h/2) = f'(x) + C\left(\frac{h}{2}\right)^p + O(h^{p+1}),
+\]
+
+entonces es posible eliminar el término dominante del error.
+
+La extrapolación de Richardson está dada por
+
+\[
+D_R =
+\frac{2^p D(h/2)-D(h)}{2^p-1}.
+\]
+
+El resultado es una aproximación con error
+
+\[
+O(h^{p+1}).
+\]
+
+Esta técnica se utiliza frecuentemente para mejorar la precisión de métodos
+de diferencias finitas sin aumentar el número de puntos de la malla.
+
+
+\subsection{Ejemplo de extrapolación de Richardson}
+
+Consideremos la derivada de
+
+\[
+f(x)=\sin x
+\]
+
+en el punto $x=0$. Sabemos que
+
+\[
+f'(0)=\cos(0)=1.
+\]
+
+Usaremos la fórmula centrada
+
+\[
+D_h f(x)=\frac{f(x+h)-f(x-h)}{2h},
+\]
+
+la cual tiene error de orden $O(h^2)$.
+
+\subsubsection*{Paso 1: aproximación con $h=0.1$}
+
+\[
+D_{0.1}f(0)
+=
+\frac{\sin(0.1)-\sin(-0.1)}{0.2}
+\approx 0.998334.
+\]
+
+\subsubsection*{Paso 2: aproximación con $h/2=0.05$}
+
+\[
+D_{0.05}f(0)
+=
+\frac{\sin(0.05)-\sin(-0.05)}{0.1}
+\approx 0.999583.
+\]
+
+\subsubsection*{Paso 3: extrapolación de Richardson}
+
+Como el método es de orden $p=2$, aplicamos
+
+\[
+D_R
+=
+\frac{2^p D(h/2)-D(h)}{2^p-1}.
+\]
+
+Entonces
+
+\[
+D_R
+=
+\frac{4(0.999583)-0.998334}{3}
+\approx 0.999999.
+\]
+
+\subsubsection*{Conclusión}
+
+La aproximación original tenía error de orden $O(h^2)$, mientras que
+la extrapolación de Richardson produce una aproximación de orden $O(h^4)$,
+mucho más precisa.
+
+
+\section{Ruido, estabilidad y precisión}
+
+\subsection{Ruido}
+
+\begin{definicion}[Ruido]
+Supongamos que en lugar de conocer los valores exactos $f(x)$ disponemos de datos
+\[
+\tilde f(x)=f(x)+\eta(x),
+\]
+donde $\eta(x)$ es una perturbación pequeña. Esta perturbación se denomina
+\textbf{ruido}.
+\end{definicion}
+
+El ruido puede deberse a errores de medición, redondeo numérico o
+modelización incompleta.
+
+La derivación numérica tiende a amplificar el ruido. Por ejemplo,
+
+\[
+\frac{\tilde f(x+h)-\tilde f(x)}{h}
+=
+\frac{f(x+h)-f(x)}{h}
++
+\frac{\eta(x+h)-\eta(x)}{h}.
+\]
+
+Si el ruido es del orden $\delta$, entonces el término perturbador es
+aproximadamente
+
+\[
+\frac{\delta}{h}.
+\]
+
+Por tanto, si $h$ es muy pequeño el ruido puede amplificarse significativamente.
+
+\subsection{Precisión}
+
+La \textbf{precisión} de una fórmula de derivación se refiere al orden de su error
+de truncamiento. Si
+
+\[
+f'(x)=D_h f(x)+Ch^p+O(h^{p+1}),
+\]
+
+decimos que el método es de orden $p$.
+
+Reducir $h$ a la mitad disminuye el error aproximadamente por un factor $2^p$.
+
+Ejemplos típicos:
+
+\begin{itemize}
+\item Diferencia hacia adelante: orden $1$.
+\item Diferencia centrada: orden $2$.
+\item Fórmulas centradas de cinco puntos: orden $4$.
+\end{itemize}
+
+\subsection{Estabilidad}
+
+Un método numérico es \textbf{estable} si pequeñas perturbaciones en los datos
+producen pequeñas variaciones en el resultado. En derivación numérica esto
+significa que
+
+\[
+\|\tilde f-f\|\ \text{pequeño}
+\quad \Rightarrow \quad
+\|D_h\tilde f-D_h f\|\ \text{pequeño}.
+\]
+
+Las derivadas amplifican las componentes de alta frecuencia. Por ejemplo,
+si $f(x)=\sin(\omega x)$ entonces
+
+\[
+f'(x)=\omega\cos(\omega x).
+\]
+
+Las frecuencias altas ($\omega$ grande) se amplifican por un factor $\omega$,
+lo cual explica por qué el ruido puede afectar seriamente a la derivación
+numérica.
+
+
+\subsubsection*{Ejemplo 3: Inestabilidad con datos oscilatorios}
+
+Sea
+
+\[
+f(x)=x^2 + 10^{-3}\sin(1000x).
+\]
+
+La parte oscilatoria tiene pequeña amplitud, pero:
+
+\[
+\frac{d}{dx}\big(10^{-3}\sin(1000x)\big)
+=
+10^{-3}\cdot 1000\cos(1000x)
+=
+1\cos(1000x).
+\]
+
+Una perturbación pequeña en amplitud produce una contribución grande en la derivada.
+
+\subsection{Relación entre ruido, precisión y estabilidad}
+
+El error total de una fórmula de derivación puede modelarse como
+
+\[
+E(h)\approx C_1 h^p + \frac{C_2}{h}\,\delta,
+\]
+
+donde $h^p$ representa el error de truncamiento y $\delta/h$ la amplificación
+del ruido.
+
+En consecuencia, disminuir $h$ reduce el error de truncamiento pero aumenta
+la influencia del ruido. En la práctica existe un valor intermedio de $h$
+que minimiza el error total.
+
+\begin{itemize}
+\item La \textbf{precisión} describe cómo mejora el método cuando $h\to0$.
+\item La \textbf{estabilidad} mide la sensibilidad frente a perturbaciones.
+\item El \textbf{ruido} es inevitable en datos reales.
+\end{itemize}
+
+
+\section{Mas ejemplos}
+
+
+\subsection{Ejemplo}
+
+Queremos aproximar
+
+\[
+f'(0), \quad f(x)=e^x.
+\]
+
+Usamos diferencia centrada
+
+\[
+D_h = \frac{f(h)-f(-h)}{2h}.
+\]
+
+Con $h=0.1$
+
+\[
+D_{0.1} \approx 1.00167
+\]
+
+Con $h=0.05$
+
+\[
+D_{0.05} \approx 1.00042
+\]
+
+Como el método es de orden $p=2$:
+
+\[
+D_R = \frac{4D_{0.05}-D_{0.1}}{3}
+\]
+
+\[
+D_R \approx 1.00000
+\]
+
+que coincide prácticamente con el valor exacto
+
+\[
+f'(0)=1.
+\]
+
+\newpage
+
+\section{Diferencias finitas}
+
+Las fórmulas de derivación numérica pertenecen a la familia de los métodos
+de \textbf{diferencias finitas}. En estos métodos las derivadas se aproximan
+mediante combinaciones lineales de valores de la función en una malla discreta.
+
+\subsection{Malla}
+
+Se considera una malla uniforme
+
+\[
+x_i = x_0 + ih, \qquad i=0,1,\dots,n,
+\]
+
+donde $h$ es el tamaño de paso.
+
+\subsection{Stencil}
+
+El conjunto de puntos utilizados para construir una aproximación se denomina
+\textbf{stencil}. Por ejemplo,
+
+\[
+x_{i-1},x_i,x_{i+1}
+\]
+
+define el stencil de la fórmula centrada de orden $O(h^2)$.
+
+\subsection{Diferencias finitas y diferencias centradas}
+
+Las \textbf{diferencias finitas} constituyen el marco general para aproximar
+derivadas en una malla discreta.
+
+Dentro de este marco existen diferentes tipos de fórmulas:
+
+\begin{itemize}
+
+\item \textbf{Diferencias hacia adelante}, que utilizan puntos a la derecha
+del punto de evaluación.
+
+\item \textbf{Diferencias hacia atrás}, que utilizan puntos a la izquierda.
+
+\item \textbf{Diferencias centradas}, que utilizan puntos a ambos lados.
+
+\end{itemize}
+
+Las fórmulas centradas suelen ser más precisas debido a la simetría del stencil,
+la cual permite cancelar términos adicionales en la expansión de Taylor.
+
+\subsection{Ejemplo paso a paso de diferencias finitas}
+
+Consideremos la función
+
+\[
+f(x)=x^2.
+\]
+
+Sabemos que su derivada exacta es
+
+\[
+f'(x)=2x.
+\]
+
+Nuestro objetivo es aproximar la derivada utilizando diferencias finitas.
+
+\subsubsection*{Paso 1: Construir una malla}
+
+Tomemos el intervalo
+
+\[
+[0,1]
+\]
+
+y dividámoslo en puntos igualmente espaciados con paso
+
+\[
+h=0.25.
+\]
+
+La malla es
+
+\[
+x_0=0,\quad x_1=0.25,\quad x_2=0.5,\quad x_3=0.75,\quad x_4=1.
+\]
+
+\subsubsection*{Paso 2: Evaluar la función}
+
+Calculamos los valores de la función:
+
+\[
+\begin{array}{c|c}
+x & f(x)=x^2 \\
+\hline
+0 & 0 \\
+0.25 & 0.0625 \\
+0.5 & 0.25 \\
+0.75 & 0.5625 \\
+1 & 1
+\end{array}
+\]
+
+\subsubsection*{Paso 3: Aplicar diferencias centradas}
+
+Usamos la fórmula
+
+\[
+f'(x_i)\approx
+\frac{f(x_{i+1})-f(x_{i-1})}{2h}.
+\]
+
+\subsubsection*{Paso 4: Calcular derivadas aproximadas}
+
+Para $x_1=0.25$
+
+\[
+f'(0.25)\approx
+\frac{f(0.5)-f(0)}{2h}
+=
+\frac{0.25-0}{0.5}
+=
+0.5.
+\]
+
+Para $x_2=0.5$
+
+\[
+f'(0.5)\approx
+\frac{f(0.75)-f(0.25)}{0.5}
+=
+\frac{0.5625-0.0625}{0.5}
+=
+1.
+\]
+
+Para $x_3=0.75$
+
+\[
+f'(0.75)\approx
+\frac{f(1)-f(0.5)}{0.5}
+=
+\frac{1-0.25}{0.5}
+=
+1.5.
+\]
+
+\subsubsection*{Paso 5: Comparación}
+
+\[
+\begin{array}{c|c|c}
+x & \text{Derivada numérica} & \text{Derivada exacta} \\
+\hline
+0.25 & 0.5 & 0.5 \\
+0.5 & 1 & 1 \\
+0.75 & 1.5 & 1.5
+\end{array}
+\]
+
+En este caso el resultado coincide exactamente porque $f(x)=x^2$
+es un polinomio de grado bajo y la fórmula centrada reproduce
+exactamente su derivada.
+
+\newpage
+\subsection{Errores en la derivación numérica}
+
+Las aproximaciones numéricas de derivadas presentan dos tipos principales de error:
+el \textbf{error de truncamiento} y el \textbf{error de redondeo}.
+
+Si una aproximación satisface
+
+\[
+E(h) = C h^p + O(h^{p+1}),
+\]
+
+se dice que el método es de \textbf{orden $p$}.
+
+\subsubsection*{Error de truncamiento}
+
+Este error aparece al truncar la serie de Taylor utilizada para derivar
+las fórmulas de diferencias.
+
+Su comportamiento típico es
+
+\[
+E_T \sim C h^p.
+\]
+
+Por tanto, disminuir el tamaño de paso $h$ reduce el error de truncamiento.
+
+\subsubsection*{Error de redondeo}
+
+En aritmética de precisión finita aparecen errores debido a la representación
+numérica de los números. Para las fórmulas de derivación suele estimarse como
+
+\[
+E_R \sim \frac{\varepsilon_{\text{mach}}}{h},
+\]
+
+donde $\varepsilon_{\text{mach}}$ es la precisión de máquina.
+
+\subsubsection*{Error total}
+
+El error total puede aproximarse por
+
+\[
+E(h) \approx C_1 h^p + \frac{C_2 \varepsilon_{\text{mach}}}{h}.
+\]
+
+Si $h$ es demasiado grande domina el error de truncamiento, mientras que si
+$h$ es demasiado pequeño domina el error de redondeo. En consecuencia, existe
+un valor intermedio de $h$ que minimiza el error total.
+
+\subsection{Limitaciones de la derivación numérica}
+
+La derivación numérica puede producir resultados poco fiables en
+las siguientes situaciones:
+
+\begin{itemize}
+
+\item Cuando la función no es diferenciable.
+
+\item Cuando los datos contienen ruido experimental.
+
+\item Cuando los puntos de la malla están demasiado separados.
+
+\item En presencia de discontinuidades o cambios bruscos.
+
+\end{itemize}
+
+\subsection{Aplicaciones}
+
+Las derivadas numéricas aparecen en numerosos problemas científicos y de ingeniería:
+
+\begin{itemize}
+
+\item Métodos para ecuaciones diferenciales ordinarias (Euler, Runge--Kutta).
+
+\item Métodos para ecuaciones en derivadas parciales (métodos de diferencias finitas).
+
+\item Optimización numérica (cálculo de gradientes).
+
+\item Procesamiento de señales e imágenes.
+
+\item Mecánica computacional y dinámica de fluidos.
+
+\item Transferencia de calor y difusión.
+
+\end{itemize}
+
+
+
+\section{Apendice}
+\subsection{Diferencias hacia adelante de alto orden}
+
+Para aproximar derivadas cuando sólo se conocen valores de la función en una malla uniforme
+\[
+x, \; x+h, \; x+2h, \; x+3h, \; x+4h, \dots
+\]
+pueden construirse fórmulas de diferencias finitas utilizando expansiones de Taylor.
+La idea consiste en combinar valores de la función de forma que se cancelen los términos
+de error de menor orden.
+
+\subsection{Expansiones de Taylor}
+
+Supongamos que $f$ es suficientemente suave. Las expansiones alrededor de $x$ son
+
+\begin{align}
+f(x+h) &= f(x) + hf'(x) + \frac{h^2}{2}f''(x) + \frac{h^3}{6}f'''(x)
++ \frac{h^4}{24}f^{(4)}(x) + O(h^5),\\
+f(x+2h) &= f(x) + 2hf'(x) + \frac{(2h)^2}{2}f''(x) + \frac{(2h)^3}{6}f'''(x)
++ \frac{(2h)^4}{24}f^{(4)}(x) + O(h^5),\\
+f(x+3h) &= f(x) + 3hf'(x) + \frac{(3h)^2}{2}f''(x) + \frac{(3h)^3}{6}f'''(x)
++ \frac{(3h)^4}{24}f^{(4)}(x) + O(h^5),\\
+f(x+4h) &= f(x) + 4hf'(x) + \frac{(4h)^2}{2}f''(x) + \frac{(4h)^3}{6}f'''(x)
++ \frac{(4h)^4}{24}f^{(4)}(x) + O(h^5).
+\end{align}
+
+\subsection{Combinación lineal}
+
+Buscamos una combinación lineal
+
+\[
+a_0 f(x) + a_1 f(x+h) + a_2 f(x+2h) + a_3 f(x+3h) + a_4 f(x+4h)
+\]
+
+que aproxime $f'(x)$. Sustituyendo las expansiones de Taylor obtenemos
+
+\begin{align}
+&a_0 f(x) + a_1 f(x+h) + a_2 f(x+2h) + a_3 f(x+3h) + a_4 f(x+4h) \\
+&= (a_0+a_1+a_2+a_3+a_4)f(x) \\
+&+ h(a_1+2a_2+3a_3+4a_4)f'(x) \\
+&+ \frac{h^2}{2}(a_1+4a_2+9a_3+16a_4)f''(x) \\
+&+ \frac{h^3}{6}(a_1+8a_2+27a_3+64a_4)f'''(x) \\
+&+ \frac{h^4}{24}(a_1+16a_2+81a_3+256a_4)f^{(4)}(x) + O(h^5).
+\end{align}
+
+Para obtener una aproximación de orden $O(h^4)$ se imponen las condiciones
+
+\begin{align}
+a_0+a_1+a_2+a_3+a_4 &= 0, \\
+a_1+2a_2+3a_3+4a_4 &= 1, \\
+a_1+4a_2+9a_3+16a_4 &= 0, \\
+a_1+8a_2+27a_3+64a_4 &= 0, \\
+a_1+16a_2+81a_3+256a_4 &= 0.
+\end{align}
+
+Resolviendo este sistema se obtiene
+
+\[
+a_0=-\frac{25}{12h},\quad
+a_1=\frac{48}{12h},\quad
+a_2=-\frac{36}{12h},\quad
+a_3=\frac{16}{12h},\quad
+a_4=-\frac{3}{12h}.
+\]
+
+Por tanto, la aproximación final es
+
+\[
+f'(x) \approx 
+\frac{-25f(x)+48f(x+h)-36f(x+2h)+16f(x+3h)-3f(x+4h)}{12h},
+\]
+
+con error
+
+\[
+O(h^4).
+\]
+
+
+\end{document}
