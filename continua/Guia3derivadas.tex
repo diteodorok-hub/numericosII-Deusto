@@ -1,0 +1,204 @@
+\documentclass[11pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry,xcolor}
+\geometry{margin=2.5cm}
+
+\title{Guía de Ejercicios\\Derivación Numérica}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+\textit{ Actúa como si todo dependiera de ti, confía como si todo dependiera de Dios.}  San Ignacio de Loyola
+
+%\vspace{0.5cm}
+
+\section*{Indicaciones para el desarrollo y la entrega}
+
+\begin{itemize}
+
+\item \textbf{Formato de entrega.}  
+La entrega debe realizarse exclusivamente en formato PDF,
+generado a partir de un documento escrito en \LaTeX.
+No se aceptarán entregas en formato Word u otros editores.
+
+\item \textbf{Presentación.}  
+Sea ordenado y claro en la redacción.  
+Incluya demostraciones completas en los ejercicios teóricos
+y explique adecuadamente los resultados obtenidos en los ejercicios prácticos.
+Las gráficas deben estar correctamente rotuladas y comentadas.
+
+\item \textbf{Plazo de entrega.}  
+El plazo es de \textbf{dos semanas contadas a partir del \today}.  
+La fecha límite de entrega es el \textbf{12+14/03/2026}. 
+
+\item \textbf{Uso de consultas.}  
+Pueden realizar consultas durante el desarrollo de la guía.
+Con todo gusto los orientaré.
+
+\item \textbf{Clase de apoyo.}  
+El martes 24 utilizaremos la clase para resolver ejercicios
+y discutir dificultades comunes.  
+Si es necesario, podremos organizar una clase adicional optativa
+para profundizar en los temas más complejos.
+
+\item \textbf{Uso de Inteligencia Artificial.}  
+Se permite el uso de herramientas de IA como apoyo.
+Sin embargo, deben ser plenamente conscientes de lo que están haciendo.
+La IA puede cometer errores o generar argumentos incorrectos.
+Usted es responsable del contenido que entrega.
+
+
+\item {\color{red}\textbf{Entrega.}}  
+Solo se deben entregar $5$ ejercicios a elección. Esta guía está pensada principalmente para estudiar y practicar, no únicamente para su entrega. Sugerencia de ejercicios para entregar: $3, 8, 9, 12, 15.$ 
+
+\end{itemize}
+
+\it{Las matemáticas no solamente poseen la verdad, sino la suprema belleza, una belleza fría y austera, como la de la escultura, sin atractivo para la parte más débil de nuestra naturaleza... }\\ Bertrand Russell
+\begin{enumerate}
+
+\item Explique por qué en muchos problemas científicos no es posible calcular derivadas usando la definición clásica de límite.
+
+\item Sea una malla uniforme
+\[
+x_i = x_0 + ih.
+\]
+Explique el significado de: tamaño de paso $h$,  puntos de malla, datos discretos.
+
+
+\item Muestre que la aproximación
+\[
+f'(x) \approx \frac{f(x+h)-f(x)}{h}
+\]
+tiene error de orden $O(h)$. a partir de $f'$, Obtenga una fórmula para aproximar $f''(x)$ y determine el orden del error de truncamiento
+
+\end{enumerate}
+
+\begin{enumerate}
+\setcounter{enumi}{3}
+
+\item Sea
+\[
+f(x)=\sin \pi x-e^{3x}.
+\]
+Aproxime $f'(1)$ usando
+\[
+\frac{f(x+h)-f(x)}{h}
+\]
+con
+\[
+h=0.1, \qquad h=0.01.
+\]
+Compare con el valor exacto.
+
+\item Escriba un programa en MATLAB que:
+\begin{itemize}
+\item defina $f(x)=g(x)+h(x)$ ($g,h$ colocar como input),
+\item calcule la derivada usando la fórmula hacia adelante en $x=1$, con $h$ como input.
+\item calcule la derivada usando la fórmula de diferencia centrada en $x=0$, con $h$ como input.
+\item compare con la derivada exacta.
+\end{itemize}
+
+\item Usando expansiones de Taylor derive la fórmula de diferencia hacia adelante de orden $O(h^2)$:
+\[
+f'(x) \approx
+\frac{-3f(x)+4f(x+h)-f(x+2h)}{2h}.
+\]
+
+\item Derive la fórmula de diferencia hacia atrás de orden $O(h^2)$.
+
+\item Demuestre que la fórmula centrada
+\[
+f'(x) \approx
+\frac{f(x+h)-f(x-h)}{2h}
+\]
+tiene error $O(h^2)$.
+
+\item Para
+\[
+f(x)=\ln(x)
+\]
+aproxime $f'(2)$ usando diferencias centradas de orden $4$. con
+\[
+h=0.1 \quad \text{y} \quad h=0.01.
+\]
+
+Compare los errores.
+
+
+\item Suponga
+\[
+D(h)=f'(x)+Ch^2+O(h^3).
+\]
+Demuestre que
+\[
+D_R=\frac{4D(h/2)-D(h)}{3}
+\]
+elimina el término dominante del error.
+
+\item Calcule
+\[
+f'(0), \qquad f(x)=\sin x
+\]
+usando diferencias centradas con
+\[
+h=0.1 \quad \text{y} \quad h=0.05.
+\]
+
+Aplique extrapolación de Richardson.
+
+\item Escriba un programa que:
+\begin{itemize}
+\item calcule $D(h)$,
+\item calcule $D(h/2)$,
+\item aplique Richardson,
+\item compare los errores.
+\end{itemize}
+
+
+
+\item Sea
+\[
+f(x)=x^2
+\]
+con malla
+\[
+0,\;0.25,\;0.5,\;0.75,\;1.
+\]
+
+Calcule la derivada usando diferencias centradas y compare con la derivada exacta.
+
+\item Escriba un programa que:
+\begin{itemize}
+\item construya una malla en $[0,1]$,
+\item calcule la derivada con diferencias centradas,
+\item grafique la derivada exacta, la derivada numérica y el error.
+\end{itemize}
+
+
+\item Compare los siguientes métodos para
+\[
+f(x)=\sin x
+\]
+
+\begin{itemize}
+\item diferencia hacia adelante
+\item diferencia hacia atrás
+\item diferencia centrada
+\item fórmula centrada de orden $O(h^4)$
+\item extrapolación de Richardson
+\item Grafique el error en función de $h$.
+\end{itemize}
+
+\it{Un matemático que no es también algo de poeta nunca será un matemático completo. Karl Weierstrass
+ ... excelsas, supremas, excelentísimas, incomprensibles, inestimables, imnumerables, admirables, inefables, singulares ..., que corresponden por semejanza a Dios mismo.} \\
+
+Luca Pacioli (En su tratado sobre La Divina Proporción)
+
+\end{enumerate}
+
+\end{document}

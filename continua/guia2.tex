@@ -1,0 +1,310 @@
+\documentclass[11pt,a4paper]{article}
+
+%-------------------------------------------
+% Paquetes básicos
+%-------------------------------------------
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{braket}
+
+\geometry{margin=2.5cm}
+
+%-------------------------------------------
+% Entorno para ejercicios
+%-------------------------------------------
+\newtheoremstyle{ejercicio}
+  {10pt}   % espacio arriba
+  {10pt}   % espacio abajo
+  {\normalfont}
+  {}
+  {\bfseries}
+  {.}
+  {0.5em}
+  {}
+
+\theoremstyle{ejercicio}
+\newtheorem{ejercicio}{Ejercicio}
+\newtheorem{theorem}{Teorema}
+\newtheorem{definition}{Definición}
+
+%-------------------------------------------
+\title{Guía de Ejercicio II:\\Oda a la Aproximación}
+\author{nICO no IKO 777}
+
+\date{}
+
+
+
+% -------------------------------------------------
+% DOCUMENTO
+% -------------------------------------------------
+\begin{document}
+
+\maketitle
+\textit{No tener moderación muchas veces es causa de que el bien se convierta en mal y la virtud en vicio.}  San Ignacio de Loyola
+
+%\vspace{0.5cm}
+
+\section*{Indicaciones para el desarrollo y la entrega}
+
+\begin{itemize}
+
+\item \textbf{Formato de entrega.}  
+La entrega debe realizarse exclusivamente en formato PDF,
+generado a partir de un documento escrito en \LaTeX.
+No se aceptarán entregas en formato Word u otros editores.
+
+\item \textbf{Presentación.}  
+Sea ordenado y claro en la redacción.  
+Incluya demostraciones completas en los ejercicios teóricos
+y explique adecuadamente los resultados obtenidos en los ejercicios prácticos.
+Las gráficas deben estar correctamente rotuladas y comentadas.
+
+\item \textbf{Plazo de entrega.}  
+El plazo es de \textbf{dos semanas contadas a partir del \today}.  
+La fecha límite de entrega es el \textbf{17/03/2026}. 
+
+\item \textbf{Uso de consultas.}  
+Pueden realizar consultas durante el desarrollo de la guía.
+Con todo gusto los orientaré.
+
+\item \textbf{Clase de apoyo.}  
+El martes 24 utilizaremos la clase para resolver ejercicios
+y discutir dificultades comunes.  
+Si es necesario, podremos organizar una clase adicional optativa
+para profundizar en los temas más complejos.
+
+\item \textbf{Uso de Inteligencia Artificial.}  
+Se permite el uso de herramientas de IA como apoyo.
+Sin embargo, deben ser plenamente conscientes de lo que están haciendo.
+La IA puede cometer errores o generar argumentos incorrectos.
+Usted es responsable del contenido que entrega.
+
+\end{itemize}
+
+\begin{enumerate}
+
+% -------------------------------------------------
+\item 
+Se tienen los datos:
+
+\[
+(0,1),\quad (1,2),\quad (2,1),\quad (3,3).
+\]
+
+\begin{enumerate}
+\item Construya el polinomio interpolante de Lagrange.
+\item Construya el ajuste lineal por mínimos cuadrados.
+\item Compare:
+\begin{itemize}
+\item Grado del polinomio
+\item Error en los nodos
+\item Comportamiento fuera del intervalo
+\end{itemize}
+\item ¿Cuál método es más estable ante pequeñas perturbaciones en los datos?
+\item Construya el polinomio interpolante de Newton con $(1,2),\quad (2,4.1),\quad (3,5.9),\quad (4,8.2).$ {\bf datos nuevos.} Compare la regresion lineal y Newton
+\end{enumerate}
+
+
+% -------------------------------------------------
+\item 
+Se dan datos de una almacenaje
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|cc}
+\hline
+$t$ & $entrada$ & $salida$ \\
+\hline
+0 & 420.157651 & 255.839425 \\
+1 & 541.411707 & 310.958667 \\
+2 & 901.157457 & 485.680014 \\
+3 & 639.080229 & 402.997356 \\
+4 & 750.875606 & 495.560775 \\
+\hline
+\end{tabular}
+\caption{Datos experimentales}
+\end{table}
+
+\begin{enumerate}
+\item Construya un spline cúbico interpolante.
+\item Ajuste un modelo logístico.
+\item Compare:
+\begin{itemize}
+\item Comportamiento en extrapolación.
+\item Sensibilidad ante perturbaciones pequeñas $10^{-3}$
+\item Discuta
+\end{itemize}
+\end{enumerate}
+
+% -------------------------------------------------
+%\item \textbf{Aproximación Racional tipo Padé vs Polinomio de Taylor}
+
+%Sea
+
+%\[
+%f(x)=\ln(1+x).
+%\]
+
+%\begin{enumerate}
+%\item Construya el polinomio de Taylor de orden 3 en $x=0$.
+%\item Construya el aproximante racional de Padé $(1,1)$.
+%\item Compare los errores en el intervalo $[-0.5,0.5]$.
+%\item Discuta cuál aproxima mejor cerca del borde del intervalo.
+%\end{enumerate}
+
+% -------------------------------------------------
+%\item \textbf{Base Ortogonal vs Base Monomial}
+%
+%Considere las funciones
+%
+%\[
+%1,\quad x,\quad x^2
+%\]
+%
+%en el intervalo $[-1,1]$.
+%
+%\begin{enumerate}
+%\item Ortogonalice el conjunto usando el producto interno
+%\[
+%\int_{-1}^1 f(x)g(x)\,dx.
+%\]
+%\item Compare la matriz asociada con la obtenida usando la base monomial.
+%\item Explique por qué la base ortogonal mejora el condicionamiento.
+%\end{enumerate}
+
+
+
+% -------------------------------------------------
+\item 
+
+%\textbf{Ortogonalidad mediante Integración por Partes}
+
+Sea
+\[
+p_n(x)=\frac{1}{2^n n!}\frac{d^n}{dx^n}\left[(x^2-1)^n\right],
+\]
+con $x\in[-1,1]$. Los polinomios de Legendre.
+
+Demuestre que
+con
+\[
+\braket{p_n|p_m}= \int_{-1}^{1} p_n(x) p_m(x)\,dx 
+\quad, n\neq m\]
+
+Los polinomios de Legendre son ortogonales en $[-1,1]$. \textit{Sugerencia: Entienda el problema 
+para $n=3$}.
+
+% -------------------------------------------------
+
+
+
+
+\item Considere la siguiente definición:
+% =====================================================
+\begin{definition}[Regresión $n-$esima (Cuadrática $n=2$)]
+Sea un conjunto de datos
+\[
+(x_i,y_i), \quad i=1,\dots,m.
+\]
+
+\noindent La regresión de orden $n$ (cuadrática si $n=2$) consiste en aproximar los datos
+mediante un modelo polinómico de grado $n$ (dos, $n=2$):
+
+\[
+y \approx {\bf c_0 + c_1 x + c_2 x^2}+ \cdots c_n x^n
+\]
+
+Los coeficientes $c_0,c_1,c_2, \dots c_n$ se determinan
+minimizando el error cuadrático total
+
+\[
+\sum_{i=1}^m 
+\left( y_i - y \right)^2.
+\]
+
+En forma matricial, el problema se escribe como
+
+\[
+\min_{\mathbf{c}}
+\|A\mathbf{c}-\mathbf{y}\|_2^2,
+\]
+
+donde la matriz $A$ se denomina matriz de diseño.
+\end{definition}
+
+Con esto en mente, considera los siguientes datos experimentales:
+
+\[
+(0,1.2), \quad (0.5,1.8), \quad (1,2.5), \quad (1.5,2.1), \quad (2,3.2).
+\]
+
+\subsection*{Parte I}
+\begin{enumerate}
+\item Construya el polinomio interpolante usando Newton.
+\item Construya el spline cúbico interpolante natural.
+\item Compare gráficamente:
+\item Analice el comportamiento fuera del intervalo $[0,2]$.
+\item Ajuste un modelo de regresión cúbica mediante mínimos cuadrados.
+\item Compare el error cuadrático total del modelo cúbico con el error del polinomio interpolante.
+\end{enumerate}
+
+
+\subsection*{Parte II}
+
+\begin{enumerate}
+\item Considere el polinomio interpolante obtenido en la Parte I.
+\begin{itemize}
+\item Calcule su expansión de Taylor de orden $3$ centrada en $x=1$.
+\item Construya el aproximante de Padé $(1,1)$ en torno a $x=1$.
+\end{itemize}
+\item Repita el procedimiento anterior utilizando ahora el modelo de regresión cúbica como función base.
+\item Compare los errores en el intervalo $[0.8,1.2]$ para:
+\begin{itemize}
+\item Taylor basado en interpolación,
+\item Padé basado en interpolación,
+\item Taylor basado en regresión,
+\item Padé basado en regresión.
+\end{itemize}
+\item ¿Influye el hecho de que la función base provenga de interpolación o regresión?
+\end{enumerate}
+
+
+
+\end{enumerate}
+
+\textbf{EXTRA, extra ... (No es necesario entregar)}
+
+Sea
+
+\[
+p_n(x)=\frac{d^n}{dx^n}\left[(x^2-1)^n\right].
+\]
+
+Demuestre que
+
+\[
+\int_{-1}^{1} p_n(x) q(x)\,dx=0
+\]
+
+para todo polinomio $q$ de grado menor que $n$.
+
+\textit{Sugerencia: aplicar integración por partes repetidamente.}\\
+
+
+\textit{Las matemáticas parecen dotar a uno de nuevo sentido.}
+Charles Darwin
+
+\vfill
+\begin{center}
+\textit{La interpolación impone coincidencia exacta;  
+la aproximación busca equilibrio global.}
+\end{center}
+
+\end{document}
