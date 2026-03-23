@@ -1,0 +1,199 @@
+\documentclass[12pt]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\geometry{a4paper, margin=2.5cm}
+
+\title{Práctica: Interpolación de Newton y Diferencias Finitas}
+\author{Métodos Numéricos}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Descripción del problema}
+
+Una persona de altura $1.86 \, \text{m}$ lanza una pelota en tres ocasiones distintas. 
+Se registra la posición vertical de la pelota (en metros) en función del tiempo (en segundos). 
+Estos datos representan la posición de la partícula en función del tiempo.
+
+\section*{Datos experimentales}
+
+\subsection*{Lanzamiento 1}
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+$t$ (s) & $y$ (m) \\
+\midrule
+0.0 & 1.86 \\
+0.5 & 3.20 \\
+1.0 & 4.10 \\
+1.5 & 4.45 \\
+2.0 & 4.20 \\
+2.5 & 3.40 \\
+3.0 & 2.10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Lanzamiento 2}
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+$t$ (s) & $y$ (m) \\
+\midrule
+0.0 & 1.86 \\
+0.5 & 3.00 \\
+1.0 & 3.95 \\
+1.5 & 4.60 \\
+2.0 & 4.55 \\
+2.5 & 3.70 \\
+3.0 & 2.40 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Lanzamiento 3}
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+$t$ (s) & $y$ (m) \\
+\midrule
+0.0 & 1.86 \\
+0.5 & 2.80 \\
+1.0 & 3.60 \\
+1.5 & 4.05 \\
+2.0 & 3.90 \\
+2.5 & 3.10 \\
+3.0 & 1.95 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Actividades}
+
+\begin{enumerate}
+\item \textbf{Interpolación de Newton}
+\begin{itemize}
+\item Para cada lanzamiento, construya el polinomio interpolante de Newton usando todos los puntos.
+\item Grafique los datos y el polinomio interpolante.
+%\item Interprete físicamente el significado del polinomio obtenido.
+\end{itemize}
+
+\item \textbf{Velocidad mediante diferencias finitas}
+
+Usando los datos del lanzamiento 1, calcule la velocidad en $t = 1.5$ s utilizando:
+
+\begin{itemize}
+\item Diferencias finitas de orden 4
+\item Diferencias finitas de orden 5
+\item Diferencias finitas de orden 6
+\end{itemize}
+
+Compare los resultados obtenidos.
+
+\item \textbf{Análisis del error}
+\begin{itemize}
+\item Explique cómo cambia el error al aumentar el orden del método.
+\item ¿Siempre aumentar el orden mejora la aproximación? Cuidado : Aunque un método tenga mayor orden, no siempre produce menor error, porque los métodos de orden alto amplifican el ruido de los datos.
+\end{itemize}
+
+\item \textbf{Interpretación física}
+\begin{itemize}
+\item ¿En qué instante la velocidad es cero?
+\item ¿Qué representa ese punto físicamente?
+\item Compare los tres lanzamientos e indique cuál tuvo mayor velocidad inicial.
+\item Es posible que algunos de los lanzamiento alcance a un cuerpo ubicado a 3 mts del lanzador que tiene una altura de 1.50 mts
+\end{itemize}
+\end{enumerate}
+
+\section*{Tabla de diferencias finitas}
+
+Sea una función $y(t)$ con paso uniforme $h$. La tabla de diferencias finitas se construye de la siguiente manera:
+
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c}
+$t$ & $y$ & $\Delta y$ & $\Delta^2 y$ & $\Delta^3 y$ & $\Delta^4 y$ \\
+\hline
+$t_0$ & $y_0$ & $\Delta y_0$ & $\Delta^2 y_0$ & $\Delta^3 y_0$ & $\Delta^4 y_0$ \\
+$t_1$ & $y_1$ & $\Delta y_1$ & $\Delta^2 y_1$ & $\Delta^3 y_1$ &  \\
+$t_2$ & $y_2$ & $\Delta y_2$ & $\Delta^2 y_2$ &  &  \\
+$t_3$ & $y_3$ & $\Delta y_3$ &  &  &  \\
+$t_4$ & $y_4$ &  &  &  &  \\
+$t_5$ & $y_5$ &  &  &  &  \\
+\end{tabular}
+\end{center}
+
+Donde:
+
+\[
+\Delta y_i = y_{i+1} - y_i
+\]
+
+\[
+\Delta^2 y_i = \Delta y_{i+1} - \Delta y_i
+\]
+
+\[
+\Delta^3 y_i = \Delta^2 y_{i+1} - \Delta^2 y_i
+\]
+
+\[
+\Delta^4 y_i = \Delta^3 y_{i+1} - \Delta^3 y_i
+\]
+
+
+\section*{Fórmulas de derivación numérica}
+
+Sea $h$ el paso entre los datos.
+
+\subsection*{Derivada centrada orden 4}
+
+\[
+f'(x_i) \approx 
+\frac{-f(x_{i+2}) + 8f(x_{i+1}) - 8f(x_{i-1}) + f(x_{i-2})}{12h}
+\]
+
+Error:
+
+\[
+E = O(h^4)
+\]
+
+
+\subsection*{Derivada centrada orden 5}
+
+\[
+f'(x_i) \approx
+\frac{-2f(x_{i+3}) + 15f(x_{i+2}) - 60f(x_{i+1}) + 20f(x_i) + 30f(x_{i-1}) - 3f(x_{i-2})}{60h}
+\]
+
+Error:
+
+\[
+E = O(h^5)
+\]
+
+
+\subsection*{Derivada centrada orden 6}
+
+\[
+f'(x_i) \approx
+\frac{f(x_{i-3}) - 9f(x_{i-2}) + 45f(x_{i-1}) - 45f(x_{i+1}) + 9f(x_{i+2}) - f(x_{i+3})}{60h}
+\]
+
+Error:
+
+\[
+E = O(h^6)
+\]
+
+
+
+\end{document}
