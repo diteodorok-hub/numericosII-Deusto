@@ -1,0 +1,1193 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{physics}
+\usepackage{multicol}
+\usepackage{hyperref}
+\usepackage{float}
+
+\geometry{left=3cm, right=3cm, top=3cm, bottom=3cm}
+
+\title{Integración Numérica}
+\author{Métodos Numéricos II}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\section*{Calendario de clases – Abril y Mayo}
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+Semana & Martes & Viernes \\
+\midrule
+Semana 1 & 14 Abril & 17 Abril \\
+Semana 2 & 21 Abril & 24 Abril \\
+Semana 3 & 28 Abril & 1 Mayo \\
+Semana 4 & 5 Mayo & 8 Mayo \\
+Semana 5 & 12 Mayo & 15 Mayo \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+\section{¿Por qué necesitamos las integrales numéricas?}
+
+En muchos problemas reales de ingeniería, física y matemáticas aplicadas, las integrales definidas no pueden calcularse de forma exacta por varias razones:
+
+\begin{itemize}
+\item La función no tiene primitiva elemental.
+\item La función está dada por datos experimentales.
+\item La función es muy complicada para integrar analíticamente.
+\item Solo conocemos valores de la función en puntos discretos.
+\end{itemize}
+
+Por ello, se utilizan métodos de \textbf{integración numérica}, que aproximan el valor de la integral:
+
+\[
+\int_a^b f(x)\,dx
+\]
+
+mediante sumas ponderadas de valores de la función.\\
+
+{\it 
+La idea general de las reglas de integración numérica es aproximar la función por un polinomio interpolador y luego integrar ese polinomio.}
+
+\section{Métodos de integración numérica}
+
+El objetivo de la integración numérica es aproximar integrales definidas de la forma:
+
+\[
+\int_a^b f(x)\,dx
+\]
+
+cuando la integral no puede calcularse de forma exacta o cuando la función solo se conoce en puntos discretos.
+
+Los métodos de integración numérica más importantes se clasifican en dos grandes grupos:
+
+\begin{itemize}
+\item Métodos de Newton-Cotes
+\item Cuadratura de Gauss
+\end{itemize}
+
+\subsection{Métodos de Newton-Cotes}
+
+Los métodos de Newton-Cotes consisten en aproximar la función $f(x)$ mediante un 
+polinomio interpolador construido usando puntos equiespaciados, y luego integrar
+dicho polinomio.
+
+Es decir:
+
+\[
+\int_a^b f(x)\,dx \approx \int_a^b p_n(x)\,dx
+\]
+
+donde $p_n(x)$ es el polinomio interpolador que pasa por puntos equiespaciados.
+
+Los métodos más conocidos de Newton-Cotes son:
+
+\begin{itemize}
+\item Regla del rectángulo
+\item Regla del trapecio
+\item Regla de Simpson 1/3
+\item Regla de Simpson 3/8
+\end{itemize}
+
+En estos métodos los puntos están igualmente espaciados:
+
+\[
+x_i = a + ih
+\]
+
+\subsection{Cuadratura de Gauss}
+
+La cuadratura de Gauss también aproxima la integral mediante una suma ponderada de valores
+de la función:
+
+\[
+\int_a^b f(x)\,dx \approx \sum_{i=1}^{n} w_i f(x_i)
+\]
+
+Sin embargo, a diferencia de Newton-Cotes, los puntos $x_i$ no son equiespaciados,
+sino que se eligen de forma óptima para maximizar la precisión del método.
+
+La cuadratura de Gauss con $n$ puntos es exacta para polinomios de grado $2n-1$,
+mientras que los métodos de Newton-Cotes con $n$ puntos son exactos para polinomios
+de grado $n$ o menor.
+
+\subsection{Diferencia entre Newton-Cotes y Gauss}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Método & Puntos & Precisión \\
+\midrule
+Newton-Cotes & Equiespaciados & Menor \\
+Gauss & No equiespaciados & Mayor \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+En resumen:
+
+\begin{itemize}
+\item Newton-Cotes: puntos equiespaciados.
+\item Gauss: puntos óptimos.
+\item Gauss suele ser más preciso con menos puntos.
+\end{itemize}
+
+
+\subsection{Precisión de un método numérico}
+
+La precisión de un método numérico mide qué tan cerca está la aproximación numérica
+del valor exacto.
+
+Se define el error como:
+
+\[
+\text{Error} = \left| I - I_h \right|
+\]
+
+donde:
+\begin{itemize}
+\item $I$ es el valor exacto de la integral
+\item $I_h$ es la aproximación numérica
+\item $h$ es el tamaño de paso
+\end{itemize}
+
+Decimos que un método numérico tiene orden de precisión $p$ si el error se comporta como:
+
+\[
+E(h) = C h^p
+\]
+
+donde:
+\begin{itemize}
+\item $C$ es una constante
+\item $h$ es el tamaño de paso
+\item $p$ es el orden del método
+\end{itemize}
+
+Esto significa que cuando el tamaño de paso disminuye, el error disminuye según la potencia $h^p$.
+
+\subsection{Interpretación}
+
+Si un método es de orden $p$, entonces:
+
+\begin{itemize}
+\item Si $h$ se reduce a la mitad, el error se reduce aproximadamente por un factor de $2^p$.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+Método & Orden & Reducción del error si $h/2$ \\
+\midrule
+Trapecio & $p=2$ & Error se divide entre 4 \\
+Simpson & $p=4$ & Error se divide entre 16 \\
+Gauss (2 puntos) & $p=4$ & Error se divide entre 16 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+Key: Un método es más preciso si su orden $p$ es mayor, ya que el error disminuye más rápido
+cuando el tamaño de paso $h$ disminuye.
+
+\newpage
+\section{Principales métodos de integración numérica}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Método & Tipo de aproximación & Orden del error & Observaciones \\
+\midrule
+Rectángulo & Constante & $O(h)$ & Muy simple, poco preciso \\
+Trapecio & Lineal & $O(h^2)$ & Fácil y estable \\
+Simpson 1/3 & Cuadrática & $O(h^4)$ & Muy preciso \\
+Simpson 3/8 & Cúbica & $O(h^4)$ & Variante de Simpson \\
+Newton-Cotes & Polinomios & Depende del grado & Generalización \\
+Cuadratura Gauss & Polinomios óptimos & Muy alto & Muy eficiente \\
+\bottomrule
+\end{tabular}
+\caption{Métodos principales de integración numérica}
+\end{table}
+
+\section{Semejanzas y diferencias}
+
+\subsection{Semejanzas}
+\begin{itemize}
+\item Todos aproximan la integral mediante sumas ponderadas.
+\item Todos se basan en interpolación polinómica.
+\item El error depende del tamaño de paso $h$.
+\end{itemize}
+
+\subsection{Diferencias}
+\begin{itemize}
+\item El grado del polinomio interpolador.
+\item La precisión (orden del error).
+\item El número de puntos utilizados.
+\item La complejidad computacional.
+\end{itemize}
+
+\section{Regla del Trapecio}
+
+\subsection{Deducción}
+
+Aproximamos la función por un polinomio de grado 1 (recta) que pasa por los puntos:
+
+\[
+(x_0, f(x_0)), \quad (x_1, f(x_1))
+\]
+
+El polinomio interpolador es:
+
+\[
+p_1(x) = f(x_0)\frac{x - x_1}{x_0 - x_1} + f(x_1)\frac{x - x_0}{x_1 - x_0}
+\]
+
+Integramos el polinomio:
+
+\[
+\int_{x_0}^{x_1} f(x)\,dx \approx \int_{x_0}^{x_1} p_1(x)\,dx
+\]
+
+Después de integrar:
+
+\[
+\int_{x_0}^{x_1} f(x)\,dx \approx \frac{h}{2} \left[ f(x_0) + f(x_1) \right]
+\]
+
+donde $h = x_1 - x_0$.
+
+
+\subsection{¿De dónde sale el polinomio $p_1(x)$?}
+
+La regla del trapecio se basa en aproximar la función $f(x)$ por un 
+\textbf{polinomio interpolador de grado 1} (una recta) que pasa por dos puntos.
+
+Sea la integral:
+
+\[
+\int_a^b f(x)\,dx
+\]
+
+Tomamos dos puntos:
+
+\[
+x_0 = a, \quad x_1 = b
+\]
+
+Interpolamos la función mediante el polinomio de Lagrange de grado 1:
+
+\[
+p_1(x) = f(x_0)L_0(x) + f(x_1)L_1(x)
+\]
+
+donde las bases de Lagrange son:
+
+\[
+L_0(x) = \frac{x - x_1}{x_0 - x_1}, 
+\quad
+L_1(x) = \frac{x - x_0}{x_1 - x_0}
+\]
+
+Por lo tanto:
+
+\[
+p_1(x) = f(x_0)\frac{x - x_1}{x_0 - x_1}
++ f(x_1)\frac{x - x_0}{x_1 - x_0}
+\]
+
+Este polinomio es la recta que pasa por los puntos $(x_0, f(x_0))$ y $(x_1, f(x_1))$.
+
+La idea del método del trapecio es aproximar:
+
+\[
+\int_a^b f(x)\,dx \approx \int_a^b p_1(x)\,dx
+\]
+
+Ahora integramos el polinomio:
+
+\[
+\int_a^b p_1(x)\,dx
+=
+\int_a^b
+\left[
+f(x_0)\frac{x - x_1}{x_0 - x_1}
++ f(x_1)\frac{x - x_0}{x_1 - x_0}
+\right] dx
+\]
+
+Sacando constantes:
+
+\[
+=
+f(x_0)\int_a^b \frac{x - x_1}{x_0 - x_1} dx
++
+f(x_1)\int_a^b \frac{x - x_0}{x_1 - x_0} dx
+\]
+
+Resolviendo las integrales y simplificando, se obtiene:
+
+\[
+\int_a^b f(x)\,dx \approx \frac{b-a}{2}\left[f(a) + f(b)\right]
+\]
+
+Esta es la \textbf{regla del trapecio}.
+
+
+\subsection{Error del Trapecio}
+
+El error viene dado por:
+
+\[
+E_T = -\frac{(b-a)^3}{12} f''(\xi)
+\]
+
+para algún $\xi \in (a,b)$.
+
+Orden del método:
+
+\[
+E_T = O(h^2)
+\]
+
+
+\subsection{Deducción del error de la regla del trapecio}
+
+La regla del trapecio aproxima la integral de una función $f(x)$ en el intervalo $[a,b]$ 
+mediante el polinomio interpolador de grado 1, $p_1(x)$:
+
+\[
+\int_a^b f(x)\,dx \approx \int_a^b p_1(x)\,dx
+\]
+
+Por lo tanto, el error viene dado por:
+
+\[
+E_T = \int_a^b f(x)\,dx - \int_a^b p_1(x)\,dx
+= \int_a^b \left[f(x) - p_1(x)\right] dx
+\]
+
+\subsubsection*{Error del polinomio interpolador}
+
+Sabemos por la teoría de interpolación de Lagrange que el error al interpolar con un 
+polinomio de grado 1 es:
+
+\[
+f(x) - p_1(x) = \frac{f''(\xi_x)}{2!}(x-a)(x-b)
+\]
+
+para algún $\xi_x \in (a,b)$.
+
+Sustituyendo en la expresión del error:
+
+\[
+E_T = \int_a^b \frac{f''(\xi_x)}{2}(x-a)(x-b)\,dx
+\]
+
+Si $f''$ es continua, podemos aplicar el teorema del valor medio para integrales, 
+y obtenemos:
+
+\[
+E_T = \frac{f''(\xi)}{2} \int_a^b (x-a)(x-b)\,dx
+\]
+
+para algún $\xi \in (a,b)$.
+
+\subsubsection*{Cálculo de la integral}
+
+Calculamos:
+
+\[
+\int_a^b (x-a)(x-b)\,dx
+\]
+
+Primero expandimos:
+
+\[
+(x-a)(x-b) = x^2 - (a+b)x + ab
+\]
+
+Entonces:
+
+\[
+\int_a^b (x^2 - (a+b)x + ab)\,dx
+\]
+
+\[
+= \left[ \frac{x^3}{3} - \frac{(a+b)x^2}{2} + abx \right]_a^b
+\]
+
+Evaluando en los límites y simplificando, se obtiene:
+
+\[
+\int_a^b (x-a)(x-b)\,dx = -\frac{(b-a)^3}{6}
+\]
+
+\subsubsection*{Error final}
+
+Sustituyendo en la expresión del error:
+
+\[
+E_T = \frac{f''(\xi)}{2} \left(-\frac{(b-a)^3}{6}\right)
+\]
+
+Por lo tanto, el error de la regla del trapecio es:
+
+\[
+E_T = -\frac{(b-a)^3}{12} f''(\xi), \quad \xi \in (a,b)
+\]
+
+\subsubsection*{Orden del método}
+
+Si definimos $h = b-a$, entonces:
+
+\[
+E_T = -\frac{h^3}{12} f''(\xi)
+\]
+
+Por lo tanto, el método del trapecio es de orden:
+
+\[
+E_T = O(h^2)
+\]
+
+El error depende de la segunda derivada de la función, es decir, de la curvatura de la función.
+
+\subsection{Ejemplo}
+
+Calcular:
+
+\[
+\int_0^1 x^2 dx
+\]
+
+Sabemos que el valor exacto es:
+
+\[
+\int_0^1 x^2 dx = \frac{1}{3}
+\]
+
+Aplicando trapecio:
+
+\[
+T = \frac{h}{2} [f(0) + f(1)]
+\]
+
+\[
+T = \frac{1}{2} [0 + 1] = \frac{1}{2}
+\]
+
+Error:
+
+\[
+Error = \left| \frac{1}{3} - \frac{1}{2} \right| = 0.1667
+\]
+
+
+
+
+\newpage
+
+\section{Regla de Simpson}
+
+Simpson aproxima la función por un polinomio de grado 2.
+
+\subsection{Simpson 1/3}
+
+\[
+\int_a^b f(x)\,dx \approx \frac{h}{3} \left[f(x_0) + 4f(x_1) + f(x_2)\right]
+\]
+
+Error:
+
+\[
+E_S = -\frac{(b-a)^5}{180} f^{(4)}(\xi)
+\]
+
+Orden:
+
+\[
+O(h^4)
+\]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\subsection{Deducción de la fórmula de Simpson 1/3}
+
+La regla de Simpson se obtiene aproximando la función $f(x)$ mediante un 
+polinomio interpolador de grado 2 (parábola).
+
+Queremos aproximar:
+
+\[
+\int_a^b f(x)\,dx
+\]
+
+Dividimos el intervalo en dos subintervalos iguales:
+
+\[
+h = \frac{b-a}{2}
+\]
+
+Definimos los puntos:
+
+\[
+x_0 = a, \quad x_1 = a+h, \quad x_2 = b
+\]
+
+Interpolamos $f(x)$ mediante el polinomio de Lagrange de grado 2:
+
+\[
+p_2(x) = f(x_0)L_0(x) + f(x_1)L_1(x) + f(x_2)L_2(x)
+\]
+
+donde:
+
+\[
+L_0(x) = \frac{(x-x_1)(x-x_2)}{(x_0-x_1)(x_0-x_2)}
+\]
+
+\[
+L_1(x) = \frac{(x-x_0)(x-x_2)}{(x_1-x_0)(x_1-x_2)}
+\]
+
+\[
+L_2(x) = \frac{(x-x_0)(x-x_1)}{(x_2-x_0)(x_2-x_1)}
+\]
+
+La regla de Simpson consiste en aproximar:
+
+\[
+\int_a^b f(x)\,dx \approx \int_a^b p_2(x)\,dx
+\]
+
+Al integrar el polinomio interpolador y simplificar (cálculo algebraico), se obtiene:
+
+\[
+\int_a^b f(x)\,dx \approx \frac{h}{3}\left[f(x_0) + 4f(x_1) + f(x_2)\right]
+\]
+
+Como $h = \frac{b-a}{2}$, también puede escribirse como:
+
+\[
+\int_a^b f(x)\,dx \approx \frac{b-a}{6}
+\left[f(a) + 4f\left(\frac{a+b}{2}\right) + f(b)\right]
+\]
+
+Esta es la \textbf{regla de Simpson 1/3}.
+
+
+
+\subsection{Deducción del error de Simpson 1/3}
+
+El error de Simpson proviene del error de interpolación cuadrática.
+
+Sabemos que el error del polinomio interpolador de grado 2 es:
+
+\[
+f(x) - p_2(x) = \frac{f^{(3)}(\xi_x)}{3!}(x-x_0)(x-x_1)(x-x_2)
+\]
+
+El error de la integral es:
+
+\[
+E_S = \int_a^b [f(x) - p_2(x)] dx
+\]
+
+\[
+E_S = \int_a^b \frac{f^{(3)}(\xi_x)}{6}
+(x-x_0)(x-x_1)(x-x_2)\,dx
+\]
+
+Aplicando el teorema del valor medio para integrales:
+
+\[
+E_S = \frac{f^{(3)}(\xi)}{6}
+\int_a^b (x-x_0)(x-x_1)(x-x_2)\,dx
+\]
+
+Al resolver esta integral (cálculo algebraico), se obtiene:
+
+\[
+E_S = -\frac{(b-a)^5}{2880} f^{(4)}(\xi)
+\]
+
+Por lo tanto, el error de Simpson es:
+
+\[
+E_S = -\frac{(b-a)^5}{180} f^{(4)}(\xi)
+\]
+
+\subsubsection*{Orden del método}
+
+Si definimos $h = \frac{b-a}{2}$, entonces:
+
+\[
+E_S = O(h^4)
+\]
+
+Por lo tanto, la regla de Simpson es de orden 4.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ejemplo Simpson 1/3}
+
+\[
+\int_0^1 x^2 dx
+\]
+
+\[
+S = \frac{1}{6} [f(0) + 4f(0.5) + f(1)]
+\]
+
+\[
+S = \frac{1}{6} [0 + 4(0.25) + 1] = \frac{2}{6} = \frac{1}{3}
+\]
+
+Simpson es exacto para polinomios de grado $\leq 3$.
+
+\subsection{Simpson 3/8}
+
+\[
+\int_a^b f(x)\,dx \approx \frac{3h}{8} \left[f(x_0) + 3f(x_1) + 3f(x_2) + f(x_3)\right]
+\]
+
+Error:
+
+\[
+E = -\frac{(b-a)^5}{80} f^{(4)}(\xi)
+\]
+
+\newpage
+
+
+\section{Regla Compuestas}
+
+\section{Regla del Trapecio Compuesta}
+
+\subsection{Deducción de la fórmula del trapecio compuesto}
+
+Sea la integral:
+
+\[
+\int_a^b f(x)\,dx
+\]
+
+Dividimos el intervalo $[a,b]$ en $n$ subintervalos de igual tamaño:
+
+\[
+h = \frac{b-a}{n}
+\]
+
+Los puntos de la partición son:
+
+\[
+x_i = a + ih, \quad i = 0,1,2,\dots,n
+\]
+
+Aplicamos la regla del trapecio en cada subintervalo:
+
+\[
+\int_{x_i}^{x_{i+1}} f(x)\,dx \approx \frac{h}{2}\left[f(x_i) + f(x_{i+1})\right]
+\]
+
+Sumamos todas las aproximaciones:
+
+\[
+\int_a^b f(x)\,dx \approx \sum_{i=0}^{n-1} \frac{h}{2}\left[f(x_i) + f(x_{i+1})\right]
+\]
+
+Factorizando:
+
+\[
+= \frac{h}{2} \left[
+f(x_0) + 2f(x_1) + 2f(x_2) + \dots + 2f(x_{n-1}) + f(x_n)
+\right]
+\]
+
+Esta es la \textbf{regla del trapecio compuesta}.
+
+\subsection{Deducción del error del trapecio compuesto}
+
+Sabemos que el error del trapecio simple en un intervalo $[x_i, x_{i+1}]$ es:
+
+\[
+E_i = -\frac{h^3}{12} f''(\xi_i)
+\]
+
+donde $\xi_i \in (x_i, x_{i+1})$.
+
+El error total es la suma de los errores en todos los subintervalos:
+
+\[
+E_T = \sum_{i=0}^{n-1} E_i
+\]
+
+\[
+E_T = \sum_{i=0}^{n-1} \left(-\frac{h^3}{12} f''(\xi_i)\right)
+\]
+
+\[
+E_T = -\frac{h^3}{12} \sum_{i=0}^{n-1} f''(\xi_i)
+\]
+
+Como $f''(x)$ es continua, podemos aplicar el teorema del valor medio y obtenemos:
+
+\[
+E_T = -\frac{h^3}{12} n f''(\xi)
+\]
+
+para algún $\xi \in (a,b)$.
+
+Como $n = \frac{b-a}{h}$, entonces:
+
+\[
+E_T = -\frac{h^3}{12} \frac{b-a}{h} f''(\xi)
+\]
+
+\[
+E_T = -\frac{(b-a)}{12} h^2 f''(\xi)
+\]
+
+Por lo tanto, el error del trapecio compuesto es:
+
+\[
+E_T = -\frac{(b-a)}{12} h^2 f''(\xi)
+\]
+
+\subsubsection*{Orden del método}
+
+\[
+E_T = O(h^2)
+\]
+
+Esto significa que si reducimos el tamaño de paso a la mitad, el error se reduce aproximadamente por un factor de 4.
+
+
+\subsection{Ejemplo}
+
+Aproximar la integral:
+
+\[
+\int_0^1 x^2 dx
+\]
+
+Sabemos que el valor exacto es:
+
+\[
+\int_0^1 x^2 dx = \frac{1}{3} = 0.3333
+\]
+
+Tomamos $n=4$ subintervalos:
+
+\[
+h = \frac{1-0}{4} = 0.25
+\]
+
+Los puntos son:
+
+\[
+x_0 = 0,\quad x_1 = 0.25,\quad x_2 = 0.5,\quad x_3 = 0.75,\quad x_4 = 1
+\]
+
+Evaluamos la función:
+
+\[
+f(x)=x^2
+\]
+
+\[
+f(0)=0,\quad f(0.25)=0.0625,\quad f(0.5)=0.25,\quad f(0.75)=0.5625,\quad f(1)=1
+\]
+
+Aplicamos trapecio compuesto:
+
+\[
+\int_0^1 f(x)\,dx \approx \frac{h}{2}
+\left[
+f(x_0) + 2f(x_1) + 2f(x_2) + 2f(x_3) + f(x_4)
+\right]
+\]
+
+\[
+= \frac{0.25}{2}
+\left[
+0 + 2(0.0625) + 2(0.25) + 2(0.5625) + 1
+\right]
+\]
+
+\[
+= 0.125 (2.75)
+\]
+
+\[
+= 0.34375
+\]
+
+Error:
+
+\[
+\text{Error} = |0.3333 - 0.34375| = 0.01045
+\]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Deducción de la fórmula de Simpson compuesta}
+
+La regla de Simpson simple aproxima la integral en un intervalo usando una parábola.
+Para mejorar la precisión, dividimos el intervalo $[a,b]$ en $n$ subintervalos iguales, con $n$ par.
+
+Definimos el tamaño de paso:
+
+\[
+h = \frac{b-a}{n}, \quad n \text{ par}
+\]
+
+Los puntos son:
+
+\[
+x_i = a + ih, \quad i=0,1,2,\dots,n
+\]
+
+Aplicamos Simpson en cada par de subintervalos:
+
+\[
+\int_{x_0}^{x_2} f(x)\,dx \approx \frac{h}{3}[f(x_0) + 4f(x_1) + f(x_2)]
+\]
+
+\[
+\int_{x_2}^{x_4} f(x)\,dx \approx \frac{h}{3}[f(x_2) + 4f(x_3) + f(x_4)]
+\]
+
+\[
+\int_{x_4}^{x_6} f(x)\,dx \approx \frac{h}{3}[f(x_4) + 4f(x_5) + f(x_6)]
+\]
+
+Sumando todas las aproximaciones:
+
+\[
+\int_a^b f(x)\,dx \approx \frac{h}{3}
+\left[
+f(x_0)
++ 4f(x_1)
++ 2f(x_2)
++ 4f(x_3)
++ 2f(x_4)
++ \dots
++ 4f(x_{n-1})
++ f(x_n)
+\right]
+\]
+
+Esta es la \textbf{regla de Simpson compuesta}.
+
+\subsection{Error de Simpson compuesto}
+
+Sabemos que el error de Simpson simple es:
+
+\[
+E = -\frac{(b-a)^5}{180} f^{(4)}(\xi)
+\]
+
+En Simpson compuesto, aplicamos Simpson en múltiples subintervalos, por lo que el error total es la suma de los errores en cada subintervalo.
+
+Si el intervalo total se divide en $n$ subintervalos de tamaño $h$, el error total es:
+
+\[
+E_S = -\frac{b-a}{180} h^4 f^{(4)}(\xi)
+\]
+
+Por lo tanto, el error del método de Simpson compuesto es:
+
+\[
+E_S = O(h^4)
+\]
+
+Esto significa que si reducimos el tamaño de paso a la mitad, el error disminuye aproximadamente por un factor de $16$.
+
+
+\subsection{Ejemplo}
+
+Aproximar la integral:
+
+\[
+\int_0^1 x^4 dx
+\]
+
+Sabemos que el valor exacto es:
+
+\[
+\int_0^1 x^4 dx = \frac{1}{5} = 0.2
+\]
+
+Tomamos $n=4$ subintervalos:
+
+\[
+h = \frac{1-0}{4} = 0.25
+\]
+
+Los puntos son:
+
+\[
+x_0 = 0,\quad x_1 = 0.25,\quad x_2 = 0.5,\quad x_3 = 0.75,\quad x_4 = 1
+\]
+
+Evaluamos la función:
+
+\[
+f(x) = x^4
+\]
+
+\[
+f(0)=0,\quad f(0.25)=0.0039,\quad f(0.5)=0.0625,\quad f(0.75)=0.3164,\quad f(1)=1
+\]
+
+Aplicamos Simpson compuesto:
+
+\[
+\int_0^1 f(x)dx \approx \frac{h}{3}
+\left[
+f(x_0) + 4f(x_1) + 2f(x_2) + 4f(x_3) + f(x_4)
+\right]
+\]
+
+\[
+= \frac{0.25}{3}
+\left[
+0 + 4(0.0039) + 2(0.0625) + 4(0.3164) + 1
+\right]
+\]
+
+\[
+= \frac{0.25}{3} (2.4062)
+\]
+
+\[
+= 0.2005
+\]
+
+Error:
+
+\[
+\text{Error} = |0.2 - 0.2005| = 0.0005
+\]
+
+
+\newpage
+
+\section{Cuadratura de Gauss}
+
+\subsection{Idea del método}
+
+A diferencia de las reglas de Newton-Cotes (trapecio, Simpson), la cuadratura de Gauss
+no utiliza puntos equiespaciados. En su lugar, el método elige puntos y pesos óptimos
+para maximizar la precisión.
+
+La integral se aproxima por:
+
+\[
+\int_a^b f(x)\,dx \approx \sum_{i=1}^{n} w_i f(x_i)
+\]
+
+donde:
+\begin{itemize}
+\item $x_i$ son los puntos de Gauss
+\item $w_i$ son los pesos
+\end{itemize}
+
+El método de Gauss con $n$ puntos es exacto para polinomios de grado $2n-1$.
+
+\subsection{Deducción de la cuadratura de Gauss con 2 puntos}
+
+Primero transformamos la integral al intervalo estándar $[-1,1]$:
+
+\[
+\int_a^b f(x)\,dx =
+\frac{b-a}{2} \int_{-1}^{1} f\left(\frac{b-a}{2}t + \frac{a+b}{2}\right) dt
+\]
+
+La cuadratura de Gauss con 2 puntos tiene la forma:
+
+\[
+\int_{-1}^{1} f(t)\,dt \approx w_1 f(t_1) + w_2 f(t_2)
+\]
+
+Queremos que la fórmula sea exacta para polinomios hasta grado 3:
+
+\[
+\int_{-1}^{1} 1\,dt = 2
+\]
+
+\[
+\int_{-1}^{1} t\,dt = 0
+\]
+
+\[
+\int_{-1}^{1} t^2\,dt = \frac{2}{3}
+\]
+
+\[
+\int_{-1}^{1} t^3\,dt = 0
+\]
+
+Entonces imponemos:
+
+\[
+w_1 + w_2 = 2
+\]
+
+\[
+w_1 t_1 + w_2 t_2 = 0
+\]
+
+\[
+w_1 t_1^2 + w_2 t_2^2 = \frac{2}{3}
+\]
+
+\[
+w_1 t_1^3 + w_2 t_2^3 = 0
+\]
+
+Por simetría:
+
+\[
+t_1 = -t_2, \quad w_1 = w_2
+\]
+
+Entonces:
+
+\[
+2w_1 = 2 \Rightarrow w_1 = w_2 = 1
+\]
+
+\[
+2w_1 t_1^2 = \frac{2}{3}
+\]
+
+\[
+t_1^2 = \frac{1}{3}
+\]
+
+\[
+t_1 = \pm \frac{1}{\sqrt{3}}
+\]
+
+Por lo tanto:
+
+\[
+\int_{-1}^{1} f(t)\,dt \approx
+f\left(-\frac{1}{\sqrt{3}}\right)
++
+f\left(\frac{1}{\sqrt{3}}\right)
+\]
+
+Finalmente, regresando al intervalo $[a,b]$:
+
+\[
+\int_a^b f(x)\,dx \approx
+\frac{b-a}{2}
+\left[
+f\left(\frac{a+b}{2} - \frac{b-a}{2\sqrt{3}}\right)
++
+f\left(\frac{a+b}{2} + \frac{b-a}{2\sqrt{3}}\right)
+\right]
+\]
+
+Esta es la fórmula de Gauss con 2 puntos.
+
+\subsection{Error de la cuadratura de Gauss}
+
+La cuadratura de Gauss con $n$ puntos es exacta para polinomios de grado $2n-1$.
+El error viene dado por:
+
+\[
+E_G = \frac{f^{(2n)}(\xi)}{(2n)!} C
+\]
+
+donde $C$ es una constante que depende del método.
+
+Para Gauss con 2 puntos:
+
+\[
+E_G = -\frac{(b-a)^5}{90} f^{(4)}(\xi)
+\]
+
+Por lo tanto, el método de Gauss con 2 puntos tiene orden:
+
+\[
+E_G = O(h^4)
+\]
+
+Sin embargo, Gauss es más preciso que Simpson porque utiliza puntos óptimos.
+
+\subsection{Ejemplo}
+
+Aproximar la integral:
+
+\[
+\int_0^1 x^2 dx
+\]
+
+Usamos Gauss con 2 puntos.
+
+Primero transformamos los puntos:
+
+\[
+x_1 = \frac{a+b}{2} - \frac{b-a}{2\sqrt{3}}
+\]
+
+\[
+x_2 = \frac{a+b}{2} + \frac{b-a}{2\sqrt{3}}
+\]
+
+Como $a=0$, $b=1$:
+
+\[
+x_1 = \frac{1}{2} - \frac{1}{2\sqrt{3}} = 0.2113
+\]
+
+\[
+x_2 = \frac{1}{2} + \frac{1}{2\sqrt{3}} = 0.7887
+\]
+
+Evaluamos:
+
+\[
+f(x_1) = (0.2113)^2 = 0.0447
+\]
+
+\[
+f(x_2) = (0.7887)^2 = 0.6220
+\]
+
+Aplicamos Gauss:
+
+\[
+\int_0^1 x^2 dx \approx \frac{1}{2} [0.0447 + 0.6220]
+\]
+
+\[
+= 0.3333
+\]
+
+Que coincide con el valor exacto:
+
+\[
+\int_0^1 x^2 dx = \frac{1}{3}
+\]
+
+La cuadratura de Gauss es exacta para polinomios de grado hasta 3.
+
+\end{document}
