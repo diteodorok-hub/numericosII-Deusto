@@ -1,0 +1,389 @@
+\documentclass[12pt,a4paper]{article}
+
+% Paquetes
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+
+\geometry{margin=2.5cm}
+
+% Título
+\title{Método de Runge-Kutta de Orden 4 (RK4) y Análisis de Error}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+
+El método de Runge-Kutta de orden 4 (RK4) es uno de los métodos numéricos más utilizados para resolver ecuaciones diferenciales ordinarias (EDO) de la forma:
+
+\begin{equation}
+\frac{dy}{dx} = f(x,y), \quad y(x_0)=y_0
+\end{equation}
+
+Este método mejora significativamente la precisión respecto al método de Euler al considerar múltiples evaluaciones de la pendiente dentro de cada paso.
+
+\section{Método de Runge-Kutta de Orden 4}
+
+Dado un paso $h>0$, el método RK4 se define como:
+
+\begin{equation}
+y_{n+1} = y_n + \frac{h}{6}\left(k_1 + 2k_2 + 2k_3 + k_4\right)
+\end{equation}
+
+donde:
+
+\begin{align}
+k_1 &= f(x_n, y_n) \\
+k_2 &= f\left(x_n + \frac{h}{2}, y_n + \frac{h}{2}k_1\right) \\
+k_3 &= f\left(x_n + \frac{h}{2}, y_n + \frac{h}{2}k_2\right) \\
+k_4 &= f(x_n + h, y_n + hk_3)
+\end{align}
+
+\subsection{Interpretación}
+
+El método calcula cuatro pendientes:
+\begin{itemize}
+\item $k_1$: pendiente inicial
+\item $k_2$: pendiente en el punto medio (estimada con $k_1$)
+\item $k_3$: otra pendiente en el punto medio
+\item $k_4$: pendiente al final del intervalo
+\end{itemize}
+
+Luego realiza un promedio ponderado que mejora la precisión.
+
+\section{Ejemplo Lineal}
+
+Consideremos:
+
+\begin{equation}
+\frac{dy}{dx} = y, \quad y(0)=1
+\end{equation}
+
+Solución exacta:
+
+\begin{equation}
+y(x)=e^x
+\end{equation}
+
+Tomando $h=0.1$:
+
+\subsection*{Primer paso}
+
+\begin{align*}
+k_1 &= 1 \\
+k_2 &= 1.05 \\
+k_3 &= 1.0525 \\
+k_4 &= 1.10525
+\end{align*}
+
+\begin{equation}
+y_1 = 1 + \frac{0.1}{6}(1 + 2(1.05) + 2(1.0525) + 1.10525)
+\end{equation}
+
+\begin{equation}
+y_1 \approx 1.10517
+\end{equation}
+
+Comparación:
+\[
+e^{0.1} \approx 1.10517
+\]
+
+\section{Ejemplo No Lineal}
+
+Consideremos:
+
+\begin{equation}
+\frac{dy}{dx} = x^2 + y, \quad y(0)=1
+\end{equation}
+
+\subsection*{Primer paso con $h=0.1$}
+
+\begin{align*}
+k_1 &= 1 \\
+k_2 &= 1.0525 \\
+k_3 &= 1.055125 \\
+k_4 &= 1.1105125
+\end{align*}
+
+\begin{equation}
+y_1 = 1 + \frac{0.1}{6}(k_1 + 2k_2 + 2k_3 + k_4)
+\end{equation}
+
+\begin{equation}
+y_1 \approx 1.10535
+\end{equation}
+
+\section{Análisis de Error}
+
+\subsection{Error Local}
+
+El error local de truncamiento para RK4 es:
+
+\begin{equation}
+\tau_n = O(h^5)
+\end{equation}
+
+\subsection{Error Global}
+
+El error global acumulado es:
+
+\begin{equation}
+e_n = O(h^4)
+\end{equation}
+
+\subsection{Consistencia}
+
+El método es consistente porque:
+
+\begin{equation}
+\lim_{h \to 0} \tau_n = 0
+\end{equation}
+
+\subsection{Estabilidad}
+
+Para la ecuación test:
+
+\begin{equation}
+\frac{dy}{dx} = \lambda y
+\end{equation}
+
+RK4 produce:
+
+\begin{equation}
+y_{n+1} = R(h\lambda) y_n
+\end{equation}
+
+donde $R(z)$ es el polinomio de estabilidad:
+
+\begin{equation}
+R(z) = 1 + z + \frac{z^2}{2} + \frac{z^3}{6} + \frac{z^4}{24}
+\end{equation}
+
+La estabilidad requiere:
+
+\begin{equation}
+|R(h\lambda)| < 1
+\end{equation}
+
+
+
+Esto lo hace mucho más preciso que Euler.
+ %%%%%%% %%%%%%% %%%%%%%
+ %%%%%%% %%%%%%% %%%%%%%
+ %%%%%%% %%%%%%% %%%%%%%
+ %%%%%%% %%%%%%% %%%%%%%
+
+ %%%%%%% %%%%%%% %%%%%%%
+\section{Derivación del Método de Runge-Kutta de Orden 4}
+
+\subsection{Expansión en serie de Taylor}
+
+La solución exacta puede expandirse alrededor de $x_n$ mediante la serie de Taylor:
+
+\begin{equation}
+y(x_n + h) = y_n + h y'(x_n) + \frac{h^2}{2} y''(x_n) + \frac{h^3}{6} y'''(x_n) + \frac{h^4}{24} y^{(4)}(x_n) + O(h^5)
+\end{equation}
+
+Dado que $y'(x) = f(x,y)$, las derivadas superiores involucran derivadas parciales de $f$, lo cual complica su cálculo.
+
+\subsection{Idea del método}
+
+Para evitar el uso de derivadas de orden superior, el método RK4 aproxima la solución mediante una combinación lineal de evaluaciones de la función $f$ en distintos puntos:
+
+\begin{equation}
+y_{n+1} = y_n + h \left(a_1 k_1 + a_2 k_2 + a_3 k_3 + a_4 k_4\right)
+\end{equation}
+
+donde las pendientes $k_i$ se definen como:
+
+\begin{align}
+k_1 &= f(x_n, y_n) \\
+k_2 &= f\left(x_n + \frac{h}{2}, \, y_n + \frac{h}{2}k_1\right) \\
+k_3 &= f\left(x_n + \frac{h}{2}, \, y_n + \frac{h}{2}k_2\right) \\
+k_4 &= f(x_n + h, \, y_n + h k_3)
+\end{align}
+
+\subsection{Determinación de los coeficientes}
+
+Los coeficientes $a_1, a_2, a_3, a_4$ se determinan imponiendo que la aproximación numérica coincida con la expansión de Taylor de la solución exacta hasta términos de orden $h^4$.
+
+Para ello, se desarrollan las expresiones de $k_1, k_2, k_3, k_4$ en serie de Taylor y se sustituyen en la fórmula general del método. Igualando coeficientes con la expansión exacta, se obtiene un sistema de ecuaciones que garantiza la coincidencia hasta orden cuatro.
+
+La solución de dicho sistema es:
+
+\begin{equation}
+a_1 = \frac{1}{6}, \quad a_2 = \frac{1}{3}, \quad a_3 = \frac{1}{3}, \quad a_4 = \frac{1}{6}
+\end{equation}
+
+\subsection{Fórmula final del método RK4}
+
+Sustituyendo los coeficientes obtenidos, se llega a la expresión clásica del método:
+
+\begin{equation}
+y_{n+1} = y_n + \frac{h}{6}\left(k_1 + 2k_2 + 2k_3 + k_4\right)
+\end{equation}
+
+
+%%%%%%%%%%%%%
+
+\section{Ejemplo ilustrativo de la derivación de RK4}
+
+Para ilustrar cómo se construye el método de Runge-Kutta de orden 4, consideremos un problema sencillo donde sea posible comparar con la expansión de Taylor.
+
+\subsection*{P1: Problema de prueba}
+
+Tomamos la ecuación diferencial:
+
+\begin{equation}
+\frac{dy}{dx} = y, \quad y(x_n)=y_n
+\end{equation}
+
+cuya solución exacta es:
+
+\begin{equation}
+y(x_n + h) = y_n e^{h}
+\end{equation}
+
+Expandiendo en serie de Taylor:
+
+\begin{equation}
+y(x_n + h) = y_n \left(1 + h + \frac{h^2}{2} + \frac{h^3}{6} + \frac{h^4}{24} + O(h^5)\right)
+\end{equation}
+
+\subsection*{P2: Aplicación de la estructura Runge-Kutta}
+
+Consideramos la forma general:
+
+\begin{equation}
+y_{n+1} = y_n + h(a_1 k_1 + a_2 k_2 + a_3 k_3 + a_4 k_4)
+\end{equation}
+
+donde:
+
+\begin{align}
+k_1 &= y_n \\
+k_2 &= y_n + \frac{h}{2}k_1 \\
+k_3 &= y_n + \frac{h}{2}k_2 \\
+k_4 &= y_n + h k_3
+\end{align}
+
+\subsection*{P3: Expansión de los términos}
+
+Calculamos cada $k_i$ en función de $y_n$:
+
+\begin{align}
+k_1 &= y_n \\
+k_2 &= y_n + \frac{h}{2}y_n = y_n\left(1 + \frac{h}{2}\right) \\
+k_3 &= y_n + \frac{h}{2}\left[y_n\left(1 + \frac{h}{2}\right)\right]
+= y_n\left(1 + \frac{h}{2} + \frac{h^2}{4}\right) \\
+k_4 &= y_n + h \left[y_n\left(1 + \frac{h}{2} + \frac{h^2}{4}\right)\right]
+= y_n\left(1 + h + \frac{h^2}{2} + \frac{h^3}{4}\right)
+\end{align}
+
+\subsection*{P4: Sustitución en la fórmula general}
+
+Sustituimos en:
+
+\begin{equation}
+y_{n+1} = y_n + h(a_1 k_1 + a_2 k_2 + a_3 k_3 + a_4 k_4)
+\end{equation}
+
+Factorizando $y_n$:
+
+\begin{align}
+y_{n+1} = y_n + h y_n \Big[ 
+& a_1 
++ a_2 \left(1 + \frac{h}{2}\right)
++ a_3 \left(1 + \frac{h}{2} + \frac{h^2}{4}\right) \\
+& + a_4 \left(1 + h + \frac{h^2}{2} + \frac{h^3}{4}\right)
+\Big]
+\end{align}
+
+\subsection*{P5: Agrupación por potencias de $h$}
+
+Agrupando términos:
+
+\begin{align}
+y_{n+1} = y_n \Big[
+1 
++ h(a_1 + a_2 + a_3 + a_4)
++ h^2\left(\frac{a_2}{2} + \frac{a_3}{2} + a_4\right) \\
++ h^3\left(\frac{a_3}{4} + \frac{a_4}{2}\right)
++ h^4\left(\frac{a_4}{4}\right)
+\Big]
+\end{align}
+
+\subsection*{P6: Comparación con Taylor}
+
+Queremos que coincida con:
+
+\begin{equation}
+y_n \left(1 + h + \frac{h^2}{2} + \frac{h^3}{6} + \frac{h^4}{24}\right)
+\end{equation}
+
+Igualando coeficientes:
+
+\begin{align}
+a_1 + a_2 + a_3 + a_4 &= 1 \\
+\frac{a_2}{2} + \frac{a_3}{2} + a_4 &= \frac{1}{2} \\
+\frac{a_3}{4} + \frac{a_4}{2} &= \frac{1}{6} \\
+\frac{a_4}{4} &= \frac{1}{24}
+\end{align}
+
+\subsection*{P7: Resolución}
+
+De la última ecuación:
+
+\begin{equation}
+a_4 = \frac{1}{6}
+\end{equation}
+
+Sustituyendo hacia atrás:
+
+\begin{align}
+\frac{a_3}{4} + \frac{1}{12} &= \frac{1}{6} \Rightarrow a_3 = \frac{1}{3} \\
+\frac{a_2}{2} + \frac{1}{6} + \frac{1}{6} &= \frac{1}{2} \Rightarrow a_2 = \frac{1}{3} \\
+a_1 &= 1 - \left(\frac{1}{3} + \frac{1}{3} + \frac{1}{6}\right) = \frac{1}{6}
+\end{align}
+
+\subsection*{P9: Resultado}
+
+Se obtiene:
+
+\begin{equation}
+a_1 = \frac{1}{6}, \quad a_2 = \frac{1}{3}, \quad a_3 = \frac{1}{3}, \quad a_4 = \frac{1}{6}
+\end{equation}
+
+lo que conduce a la fórmula clásica:
+
+\begin{equation}
+y_{n+1} = y_n + \frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4)
+\end{equation}
+
+\section{Orden superior}
+
+\begin{itemize}
+\item Método de Dormand–Prince (orden 5)
+El método de Dormand–Prince es un esquema de integración numérica de tipo Runge–Kutta de orden 5(4) usado para resolver ecuaciones diferenciales ordinarias con control adaptativo del paso. Fue desarrollado en 1980 por John R. Dormand y Peter J. Prince, y se caracteriza por su eficiencia y precisión en el cálculo automático del tamaño de paso.
+
+\item Método de Fehlberg (orden 4–5) 
+Fehlberg method
+El método de Fehlberg es una técnica numérica adaptativa basada en el esquema de Runge-Kutta, utilizada para resolver ecuaciones diferenciales ordinarias (EDO). Su relevancia radica en que permite controlar el error de integración y ajustar automáticamente el tamaño de paso, optimizando la precisión y el rendimiento computacional.
+
+\item (Orden 6-8) Alta precisión
+\end{itemize}
+
+Estos métodos son útiles porque incorporan control de error adaptativo, es decir, ajustan automáticamente el tamaño del paso $h$. 
+
+Problemas:\begin{itemize}
+\item Mayor costo computacional
+\item Mayor complejidad en su construcción
+\item Problemas potenciales de estabilidad. NO siempre mejor
+\end{itemize}
+\end{document}
